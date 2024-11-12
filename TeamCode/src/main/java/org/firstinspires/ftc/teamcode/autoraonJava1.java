@@ -118,35 +118,64 @@ public class autoraonJava1 extends LinearOpMode {
    * dist == 인코더 값
    * CONUTS_PER_INCH * n = n인치 이동 가량의 인코더 값
    */
-  private void Move2(double x, double y, double dist, double bearing) {
+  private void Move2(double x, double y, double dist, double targetAngle) {
     x = Math.abs(power) * x;
     y = Math.abs(power) * y;
     rx = 0;
     denominator = JavaUtil.maxOfList(JavaUtil.createListWith(JavaUtil.sumOfList(JavaUtil.createListWith(Math.abs(y), Math.abs(x), Math.abs(rx))), 1));
     // 인코더 계산을 위한 용도로 초기화
-    left1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    left2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    right1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    right2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    left1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    left2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    right1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    right2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    resetEncoder();
+    resetMotor();
     resetPID();
-    // 초기화 한 이유
     // 바퀴 4개의 인코더 값의 합 / 4 == 바퀴 4개 인코더 값의 평균
     // 평균 - 목표거리 == 오차
     // 오차의 절대값 > 허용오차(1인치)
     while (opModeIsActive() && Math.abs(left1.getCurrentPosition() - dist) > COUNTS_PER_INCH) {
       callIMU();
-      rx = PIDControl(bearing, yaw);
+      rx = PIDControl(targetAngle, yaw);
       denominator = JavaUtil.maxOfList(JavaUtil.createListWith(JavaUtil.sumOfList(JavaUtil.createListWith(Math.abs(y), Math.abs(x), Math.abs(rx))), 1));
       left1.setPower((Range.clip((y + x) * -Kp * (left1.getCurrentPosition() - dist), -power, power) + rx) / denominator);
       left2.setPower((Range.clip((y - x) * -Kp * (left1.getCurrentPosition() - dist), -power, power) - rx) / denominator);
       right1.setPower((Range.clip((y - x) * -Kp * (left1.getCurrentPosition() - dist), -power, power) + rx) / denominator);
       right2.setPower((Range.clip((y + x) * -Kp * (left1.getCurrentPosition() - dist), -power, power) - rx) / denominator);
       telemetry.addData("l1", left1.getCurrentPosition());
+      telemetry.update();
+    }
+    left1.setPower(0);
+    left2.setPower(0);
+    right1.setPower(0);
+    right2.setPower(0);
+  }
+
+  /**
+   * double x = x_targetDist
+   * double y = y_targetDist
+   * targetAngle
+   * targetAngle값을 잘 지정하면 포물선으로 갈지도?*/
+  private void Move3(double x, double y, double targetAngle) {
+    double dist = Math.sqrt(x*x + y*y);
+    double error = left1.getCurrentPosition() - dist;
+    x = Math.abs(power) * x;
+    y = Math.abs(power) * y;
+    rx = 0;
+
+    // 인코더 계산을 위한 용도로 초기화
+    resetMotor();
+    // 바퀴 4개의 인코더 값의 합 / 4 == 바퀴 4개 인코더 값의 평균
+    // 평균 - 목표거리 == 오차
+    // 오차의 절대값 > 허용오차(1인치)
+    while (opModeIsActive() && Math.abs(error) > COUNTS_PER_INCH) {
+      callIMU();
+      error = left1.getCurrentPosition() - dist;
+
+      rx = PIDControl(targetAngle, yaw);
+      denominator = JavaUtil.maxOfList(JavaUtil.createListWith(JavaUtil.sumOfList(JavaUtil.createListWith(Math.abs(y), Math.abs(x), Math.abs(rx))), 1));  // (x + y + rx) 값과 1중에서 더 높은 값을 반환
+
+      left1.setPower((((y + x) * -Kp * error) + rx) / denominator);
+      left2.setPower((((y - x) * -Kp * error) - rx) / denominator);
+      right1.setPower((((y - x) * -Kp * error) + rx) / denominator);
+      right2.setPower((((y + x) * -Kp * error) - rx) / denominator);
+
+      telemetry.addData("left1", left1.getCurrentPosition());
       telemetry.update();
     }
     left1.setPower(0);
@@ -217,19 +246,6 @@ public class autoraonJava1 extends LinearOpMode {
     yaw = orientation.getYaw(AngleUnit.DEGREES);
   }
 
-  private void parking() {
-    if (myAprilTagDetection.id == 14 || myAprilTagDetection.id == 11) {
-      isParking = true;
-      resetEncoder();
-      resetPID();
-      callIMU();
-      Move2(0, 1, COUNTS_PER_INCH * (myAprilTagDetection.ftcPose.range - 20), myAprilTagDetection.ftcPose.bearing);
-      sleep(1000);
-      // Y값이 -인지 확인하기
-      Move2(1, 0, COUNTS_PER_INCH * 25, 0);
-    }
-  }
-
   /**
    * Initialize AprilTag Detection.
    */
@@ -298,7 +314,7 @@ public class autoraonJava1 extends LinearOpMode {
   /**
    * 모터 관련 여러기능 초기화
    */
-  private void resetEncoder() {
+  private void resetMotor() {
     int EncoderAvg;
 
     // 모드 초기화(바퀴)
@@ -314,7 +330,7 @@ public class autoraonJava1 extends LinearOpMode {
     EncoderAvg = (left1.getCurrentPosition() + left2.getCurrentPosition() + right1.getCurrentPosition() + right2.getCurrentPosition()) / 4;
   }
 
-  private void _initIMU() {
+  private void _initIMU() { //                                                                     로고 방향                                                 USB포트 방향
     imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD, RevHubOrientationOnRobot.UsbFacingDirection.LEFT)));
     imu.resetYaw();
     telemetry.addData("IMU 초기화 됨", "시작 대기중");
@@ -362,7 +378,7 @@ public class autoraonJava1 extends LinearOpMode {
     turnSpeed = 0.4;
     weight = 0.055;
 
-    // 초기화 함수
+    // 초기화
     _initPID();
     _initAprilTag();
     _initMotor();
@@ -371,24 +387,40 @@ public class autoraonJava1 extends LinearOpMode {
     waitForStart();
     if (opModeIsActive()) {
       // Put run blocks here.
-      while (opModeIsActive()) {
-        // Put loop blocks here.
+      while (opModeIsActive()) { // 반복
         callIMU();
-//        // Get a list of AprilTag detections.
-//        myAprilTagDetections = myAprilTagProcessor.getDetections();
-//        // Iterate through list and call a function to display info for each recognized AprilTag.
-//        for (AprilTagDetection myAprilTagDetection_item2 : myAprilTagDetections) {
-//          myAprilTagDetection = myAprilTagDetection_item2;
-//          if (myAprilTagDetection.metadata != null) {
-//            if (isParking == false) {
-//              parking();
-//            }
-//          }
-//        }
-        turnBot(PIDControl(0, yaw));
+        myAprilTagDetections = myAprilTagProcessor.getDetections();
+        for (AprilTagDetection myAprilTagDetection_item2 : myAprilTagDetections) {
+          myAprilTagDetection = myAprilTagDetection_item2;
+          if (myAprilTagDetection.metadata != null) {
+            if (isParking == false) {
+              parking();
+            }
+          }
+        }
 
         telemetry.update();
       }
+    }
+  }
+
+
+  private void parking() {
+    if (myAprilTagDetection.id == 14 || myAprilTagDetection.id == 11) {
+      isParking = true;
+      resetMotor();
+      resetPID();
+      callIMU();
+
+//      Move2(0, 1, COUNTS_PER_INCH * (myAprilTagDetection.ftcPose.range - 20), myAprilTagDetection.ftcPose.bearing);
+//      sleep(1000);
+//      // Y값이 -인지 확인하기
+//      Move2(1, 0, COUNTS_PER_INCH * 25, 0);
+      // 테스트 해보고 거리조절
+      Move3(0, COUNTS_PER_INCH * (myAprilTagDetection.ftcPose.range - 20), myAprilTagDetection.ftcPose.bearing);
+      sleep(1000);
+      // Y값이 -인지 확인하기
+      Move3(COUNTS_PER_INCH * 25, 0, 0);
     }
   }
 }
