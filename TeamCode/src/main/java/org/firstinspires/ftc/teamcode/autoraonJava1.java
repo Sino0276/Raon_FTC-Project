@@ -38,7 +38,8 @@ public class autoraonJava1 extends LinearOpMode {
 	double yaw;
 	List<AprilTagDetection> myAprilTagDetections;
 	boolean isParking;
-	AprilTagDetection myAprilTagDetection;
+	boolean isBasket;
+	AprilTagDetection aprilTag;
 	AprilTagProcessor myAprilTagProcessor;
 
 	double COUNTS_PER_INCH;
@@ -57,6 +58,16 @@ public class autoraonJava1 extends LinearOpMode {
 	double lastError;
 	ElapsedTime timer;
 	double weight;
+
+	private void _initHardWareMap() {
+		left1 = hardwareMap.get(DcMotor.class, "left1");
+		left2 = hardwareMap.get(DcMotor.class, "left2");
+		right1 = hardwareMap.get(DcMotor.class, "right1");
+		right2 = hardwareMap.get(DcMotor.class, "right2");
+		imu = hardwareMap.get(IMU.class, "imu");
+		arm_angle = hardwareMap.get(DcMotor.class, "arm_angle");
+		arm_length = hardwareMap.get(DcMotor.class, "arm_length");
+	}
 
 	private void _initAprilTag() {
 		AprilTagProcessor.Builder myAprilTagProcessorBuilder;
@@ -188,10 +199,24 @@ public class autoraonJava1 extends LinearOpMode {
 		return wrappingAngle;
 	}
 
+	private void mecanmTurnCCW(double targetAngle) {
+		imu.resetYaw();
+		resetPID();
+		// rx = -(Math.abs(power) * (targetAngle / Math.abs(targetAngle)));
+		while (Math.abs(angleWrap(targetAngle - yaw)) > 2) {
+			callIMU();
+			turnBot(PIDController(targetAngle, yaw));
+		}
+		left1.setPower(0);
+		left2.setPower(0);
+		right1.setPower(0);
+		right2.setPower(0);
+	}
+
 	/**
 	 * https://www.ctrlaltftc.com/the-pid-controller
 	 */
-	private double PIDControl(double reference, double now) {
+	private double PIDController(double reference, double now) {
 		double error;
 		double derivative;
 		double out;
@@ -212,30 +237,8 @@ public class autoraonJava1 extends LinearOpMode {
 		return out;
 	}
 
-	private void mecanmTurnCCW(double targetAngle) {
-		imu.resetYaw();
-		resetPID();
-		// rx = -(Math.abs(power) * (targetAngle / Math.abs(targetAngle)));
-		while (Math.abs(angleWrap(targetAngle - yaw)) > 2) {
-			callIMU();
-			turnBot(PIDControl(targetAngle, yaw));
-		}
-		left1.setPower(0);
-		left2.setPower(0);
-		right1.setPower(0);
-		right2.setPower(0);
-	}
-
-	private void telemetryAprilTag() {
-		// Get a list of AprilTag detections.
-		myAprilTagDetections = myAprilTagProcessor.getDetections();
-		// Iterate through list and call a function to display info for each recognized AprilTag.
-		for (AprilTagDetection myAprilTagDetection_item : myAprilTagDetections) {
-			myAprilTagDetection = myAprilTagDetection_item;
-			if (myAprilTagDetection.metadata != null) {
-				telemetry.addLine("" + JavaUtil.formatNumber(myAprilTagDetection.ftcPose.yaw, 6, 1));
-			}
-		}
+	private void armController() {
+		
 	}
 
 	/**
@@ -255,7 +258,7 @@ public class autoraonJava1 extends LinearOpMode {
 		// 오차의 절대값 > 허용오차(1인치)
 		while (opModeIsActive() && Math.abs(left1.getCurrentPosition() - dist) > COUNTS_PER_INCH) {
 			callIMU();
-			rx = PIDControl(targetAngle, yaw);
+			rx = PIDController(targetAngle, yaw);
 			denominator = JavaUtil.maxOfList(JavaUtil.createListWith(JavaUtil.sumOfList(JavaUtil.createListWith(Math.abs(y), Math.abs(x), Math.abs(rx))), 1));
 			left1.setPower((Range.clip((y + x) * -Kp * (left1.getCurrentPosition() - dist), -power, power) + rx) / denominator);
 			left2.setPower((Range.clip((y - x) * -Kp * (left1.getCurrentPosition() - dist), -power, power) - rx) / denominator);
@@ -293,7 +296,7 @@ public class autoraonJava1 extends LinearOpMode {
 			callIMU();
 			error = left1.getCurrentPosition() - dist;
 
-			rx = PIDControl(targetAngle, yaw);
+			rx = PIDController(targetAngle, yaw);
 			denominator = JavaUtil.maxOfList(JavaUtil.createListWith(JavaUtil.sumOfList(JavaUtil.createListWith(Math.abs(y), Math.abs(x), Math.abs(rx))), 1));  // (x + y + rx) 값과 1중에서 더 높은 값을 반환
 
 			left1.setPower((((y + x) * -Kp * error) + rx) / denominator);
@@ -311,8 +314,20 @@ public class autoraonJava1 extends LinearOpMode {
 	}
 
 	private void alignWithAprilTag(AprilTagDetection aprilTag) {
-		if (myAprilTagDetection.id == aprilTag.id) {
+		if (this.aprilTag.id == aprilTag.id) {
 			Move3(aprilTag.ftcPose.x, 0, aprilTag.ftcPose.bearing);
+		}
+	}
+
+	private void aprilEx() {
+		// Get a list of AprilTag detections.
+		myAprilTagDetections = myAprilTagProcessor.getDetections();
+		// Iterate through list and call a function to display info for each recognized AprilTag.
+		for (AprilTagDetection myAprilTagDetection_item : myAprilTagDetections) {
+			aprilTag = myAprilTagDetection_item;
+			if (aprilTag.metadata != null) {
+				telemetry.addLine("" + JavaUtil.formatNumber(aprilTag.ftcPose.yaw, 6, 1));
+			}
 		}
 	}
 
@@ -324,22 +339,15 @@ public class autoraonJava1 extends LinearOpMode {
 		double WHEEL_DIAMETER_INCHES = 3.7;
 		COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * Math.PI);
 
-		left1 = hardwareMap.get(DcMotor.class, "left1");
-		left2 = hardwareMap.get(DcMotor.class, "left2");
-		right1 = hardwareMap.get(DcMotor.class, "right1");
-		right2 = hardwareMap.get(DcMotor.class, "right2");
-		imu = hardwareMap.get(IMU.class, "imu");
-		arm_angle = hardwareMap.get(DcMotor.class, "arm_angle");
-		arm_length = hardwareMap.get(DcMotor.class, "arm_length");
-
 		isParking = false;
+		isBasket = false;
 		// 카메라 사용여부
 		USE_WEBCAM = true;
 		power = 0.4;
 		turnSpeed = 0.4;
-		weight = 0.055;
 
 		// 초기화
+		_initHardWareMap();
 		_initPID();
 		_initAprilTag();
 		_initMotor();
@@ -351,12 +359,20 @@ public class autoraonJava1 extends LinearOpMode {
 			while (opModeIsActive()) { // 반복
 				callIMU();
 				myAprilTagDetections = myAprilTagProcessor.getDetections();
-				for (AprilTagDetection myAprilTagDetection_item2 : myAprilTagDetections) {
-					myAprilTagDetection = myAprilTagDetection_item2;
-					if (myAprilTagDetection.metadata != null) {
+				for (AprilTagDetection item : myAprilTagDetections) {
+					aprilTag = item;
+					if (aprilTag.metadata != null) {
+
 						if (isParking == false) {
-							scoring_basket(myAprilTagDetection);
-							parking(myAprilTagDetection);
+							if (isBasket == false) {
+								isBasket = true;
+								scoring_basket(aprilTag);
+								continue;
+							}
+							else {
+								isParking = true;
+								parking(aprilTag);
+							}
 						}
 					}
 				}
@@ -365,8 +381,11 @@ public class autoraonJava1 extends LinearOpMode {
 		}
 	}
 
+	/**이 함수는 끝나면 11 or 14 태그를 바라본다**/
 	private void scoring_basket(AprilTagDetection aprilTag) {
 		if (aprilTag.id == 13 || aprilTag.id == 16) {
+			callIMU();
+
 			Move3(0, COUNTS_PER_INCH * 24, 0);
 			sleep(1000);
 			mecanmTurnCCW(90); ///////////////////// 확인
@@ -376,22 +395,22 @@ public class autoraonJava1 extends LinearOpMode {
 			alignWithAprilTag(aprilTag);
 			mecanmTurnCCW(45);
 			// 팔 움직이는 코드
+			//
+			// ↖ : ←  ↓
+			mecanmTurnCCW(45+90);
 		}
 	}
 
+	/**이 함수는 끝나면 11 or 14 태그를 바라본다**/
 	private void parking(AprilTagDetection aprilTag) {
-		if (myAprilTagDetection.id == 11 || myAprilTagDetection.id == 14) {
-			isParking = true;
-			resetMotor();
-			resetPID();
+		if (aprilTag.id == 11 || aprilTag.id == 14) {
 			callIMU();
-
 //      Move2(0, 1, COUNTS_PER_INCH * (myAprilTagDetection.ftcPose.range - 20), myAprilTagDetection.ftcPose.bearing);
 //      sleep(1000);
 //      // Y값이 -인지 확인하기
 //      Move2(1, 0, COUNTS_PER_INCH * 25, 0);
 			// 테스트 해보고 거리조절
-			Move3(0, COUNTS_PER_INCH * (myAprilTagDetection.ftcPose.range - 20), myAprilTagDetection.ftcPose.bearing);
+			Move3(0, COUNTS_PER_INCH * (this.aprilTag.ftcPose.range - 20), this.aprilTag.ftcPose.bearing);
 			sleep(1000);
 			alignWithAprilTag(aprilTag);
 			sleep(1000);
