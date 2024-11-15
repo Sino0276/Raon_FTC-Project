@@ -15,8 +15,8 @@ public class MecanumController {
 	double DRIVE_GEAR_REDUCTION = 1;
 	double WHEEL_DIAMETER_INCHES = 3.7;
 	public double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * Math.PI);
-	double power;
-	double turnSpeed;
+	double power = 0.6;
+	double turnSpeed = 0.4;
 	double denominator;
 	DcMotor left1;
 	DcMotor left2;

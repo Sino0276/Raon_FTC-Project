@@ -115,7 +115,6 @@ public class autoraonJava1 extends LinearOpMode {
 		_initHardWareMap();
 		PIDCtrl._initPID();
 		_initAprilTag();
-//		_initMotor();
 		armCtrl._initArm();
 		mecanumCtrl._initMotor();
 		IMUCtrl._initIMU();
