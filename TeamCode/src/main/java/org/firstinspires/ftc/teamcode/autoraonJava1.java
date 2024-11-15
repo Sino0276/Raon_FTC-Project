@@ -281,10 +281,11 @@ public class autoraonJava1 extends LinearOpMode {
 	 */
 	private void Move3(double x, double y, double targetAngle) {
 		double dist = Math.sqrt(x * x + y * y);
-		double error = left1.getCurrentPosition() - dist;
-		x = Math.abs(power) * x;
-		y = Math.abs(power) * y;
+		double error = dist - left1.getCurrentPosition();
+		//x = Math.abs(power) * x;
+		//y = Math.abs(power) * y;
 		rx = 0;
+		denominator = JavaUtil.maxOfList(JavaUtil.createListWith(JavaUtil.sumOfList(JavaUtil.createListWith(Math.abs(y), Math.abs(x), Math.abs(rx))), 1));
 
 		// 인코더 계산을 위한 용도로 초기화
 		resetMotor();
@@ -292,17 +293,25 @@ public class autoraonJava1 extends LinearOpMode {
 		// 바퀴 4개의 인코더 값의 합 / 4 == 바퀴 4개 인코더 값의 평균
 		// 평균 - 목표거리 == 오차
 		// 오차의 절대값 > 허용오차(1인치)
-		while (opModeIsActive() && Math.abs(error) > COUNTS_PER_INCH) {
+		while (opModeIsActive() && Math.abs(error) >= 10) {
 			callIMU();
-			error = left1.getCurrentPosition() - dist;
+			error = dist - left1.getCurrentPosition();
 
 			rx = PIDController(targetAngle, yaw);
-			denominator = JavaUtil.maxOfList(JavaUtil.createListWith(JavaUtil.sumOfList(JavaUtil.createListWith(Math.abs(y), Math.abs(x), Math.abs(rx))), 1));  // (x + y + rx) 값과 1중에서 더 높은 값을 반환
+			denominator = JavaUtil.maxOfList(JavaUtil.createListWith(JavaUtil.sumOfList(JavaUtil.createListWith(Math.abs(y), Math.abs(x), Math.abs(rx))), 1));
 
-			left1.setPower((((y + x) * -Kp * error) + rx) / denominator);
-			left2.setPower((((y - x) * -Kp * error) - rx) / denominator);
-			right1.setPower((((y - x) * -Kp * error) + rx) / denominator);
-			right2.setPower((((y + x) * -Kp * error) - rx) / denominator);
+//			left1.setPower(power * ((((y + x) * Kp * error) + rx) / denominator));
+//			left2.setPower(power * ((((y - x) * Kp * error) - rx) / denominator));
+//			right1.setPower(power * ((((y - x) * Kp * error) + rx) / denominator));
+//			right2.setPower(power * ((((y + x) * Kp * error) - rx) / denominator));
+			left1.setPower(power * ((((y + x) - left1.getCurrentPosition()) + rx) / denominator));
+			left2.setPower(power * ((((y - x) - left2.getCurrentPosition()) - rx) / denominator));
+			right1.setPower(power * ((((y - x) - right1.getCurrentPosition()) + rx) / denominator));
+			right2.setPower(power * ((((y + x) - right2.getCurrentPosition()) - rx) / denominator));
+//			left1.setPower(power * ((error) + rx) / Math.abs(dist));
+//			left2.setPower(power * ((error) - rx) / Math.abs(dist));
+//			right1.setPower(power * ((error) + rx) / Math.abs(dist));
+//			right2.setPower(power * ((error) - rx) / Math.abs(dist));
 
 			telemetry.addData("left1", left1.getCurrentPosition());
 			telemetry.update();
@@ -313,9 +322,10 @@ public class autoraonJava1 extends LinearOpMode {
 		right2.setPower(0);
 	}
 
-	private void alignWithAprilTag(AprilTagDetection aprilTag) {
-		if (this.aprilTag.id == aprilTag.id) {
-			Move3(aprilTag.ftcPose.x, 0, aprilTag.ftcPose.bearing);
+	private void alignWithAprilTag(AprilTagDetection tag) {
+		if (this.aprilTag.id == tag.id) {
+			Move3(tag.ftcPose.x, 0, 0);
+			mecanmTurnCCW(tag.ftcPose.bearing);
 		}
 	}
 
@@ -343,7 +353,7 @@ public class autoraonJava1 extends LinearOpMode {
 		isBasket = false;
 		// 카메라 사용여부
 		USE_WEBCAM = true;
-		power = 0.4;
+		power = 0.6;
 		turnSpeed = 0.4;
 
 		// 초기화
@@ -358,64 +368,77 @@ public class autoraonJava1 extends LinearOpMode {
 			// Put run blocks here.
 			while (opModeIsActive()) { // 반복
 				callIMU();
-				myAprilTagDetections = myAprilTagProcessor.getDetections();
-				for (AprilTagDetection item : myAprilTagDetections) {
-					aprilTag = item;
-					if (aprilTag.metadata != null) {
 
-						if (isParking == false) {
-							if (isBasket == false) {
-								isBasket = true;
-								scoring_basket(aprilTag);
-								continue;
-							}
-							else {
-								isParking = true;
-								parking(aprilTag);
-							}
-						}
-					}
-				}
+//				Move3(0, COUNTS_PER_INCH * 10, 0);
+
+				autonomus();
+
+				sleep(5000);
+
 				telemetry.update();
 			}
 		}
 	}
 
-	/**이 함수는 끝나면 11 or 14 태그를 바라본다**/
-	private void scoring_basket(AprilTagDetection aprilTag) {
-		if (aprilTag.id == 13 || aprilTag.id == 16) {
-			callIMU();
+	private void autonomus() {
+		myAprilTagDetections = myAprilTagProcessor.getDetections();
+		for (AprilTagDetection item : myAprilTagDetections) {
+			aprilTag = item;
+			if (aprilTag.metadata != null) {
 
-			Move3(0, COUNTS_PER_INCH * 24, 0);
-			sleep(1000);
-			mecanmTurnCCW(90); ///////////////////// 확인
-			sleep(1000);
-			Move3(0, aprilTag.ftcPose.range - (24 * COUNTS_PER_INCH), 0);
-			sleep(1000);
-			alignWithAprilTag(aprilTag);
-			mecanmTurnCCW(45);
-			// 팔 움직이는 코드
-			//
-			// ↖ : ←  ↓
-			mecanmTurnCCW(45+90);
+				if (isParking == false) {
+					if (isBasket == false) {
+						isBasket = true;
+						Move3(0, COUNTS_PER_INCH * 24, 0);
+						sleep(1000);
+						mecanmTurnCCW(-90); ///////////////////// 확인
+						sleep(1000);
+						
+						scoring_basket(aprilTag);
+						continue;
+					}
+					else {
+						isParking = true;
+						parking(aprilTag);
+					}
+				}
+			}
 		}
 	}
 
 	/**이 함수는 끝나면 11 or 14 태그를 바라본다**/
-	private void parking(AprilTagDetection aprilTag) {
-		if (aprilTag.id == 11 || aprilTag.id == 14) {
+	private void scoring_basket(AprilTagDetection tag) {
+		if (tag.id == 13 || tag.id == 16) {
+			callIMU();
+
+
+			Move3(0, tag.ftcPose.range - (24 * COUNTS_PER_INCH), 0);
+			sleep(1000);
+			alignWithAprilTag(tag);
+			mecanmTurnCCW(-45);
+			// 팔 움직이는 코드
+			sleep(1000);
+			//
+			// ↖ : ←  ↓
+			mecanmTurnCCW(-(45+90));
+		}
+	}
+
+	/**이 함수는 끝나면 11 or 14 태그를 바라본다**/
+	private void parking(AprilTagDetection tag) {
+		if (tag.id == 11 || tag.id == 14) {
 			callIMU();
 //      Move2(0, 1, COUNTS_PER_INCH * (myAprilTagDetection.ftcPose.range - 20), myAprilTagDetection.ftcPose.bearing);
 //      sleep(1000);
 //      // Y값이 -인지 확인하기
 //      Move2(1, 0, COUNTS_PER_INCH * 25, 0);
 			// 테스트 해보고 거리조절
-			Move3(0, COUNTS_PER_INCH * (this.aprilTag.ftcPose.range - 20), this.aprilTag.ftcPose.bearing);
+			Move3(0, COUNTS_PER_INCH * (tag.ftcPose.range - 10), tag.ftcPose.bearing);
 			sleep(1000);
-			alignWithAprilTag(aprilTag);
+			alignWithAprilTag(tag);
 			sleep(1000);
 			// X값이 -인지 확인하기
-			Move3(COUNTS_PER_INCH * 25, 0, 0);
+			Move3(COUNTS_PER_INCH * 20, 0, 0);
 		}
 	}
 }
