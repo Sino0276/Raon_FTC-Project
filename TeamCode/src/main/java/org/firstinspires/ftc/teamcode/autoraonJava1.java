@@ -203,7 +203,7 @@ public class autoraonJava1 extends LinearOpMode {
 		imu.resetYaw();
 		resetPID();
 		// rx = -(Math.abs(power) * (targetAngle / Math.abs(targetAngle)));
-		while (Math.abs(angleWrap(targetAngle - yaw)) > 2) {
+		while (Math.abs(angleWrap(targetAngle - yaw)) > 1) {
 			callIMU();
 			turnBot(PIDController(targetAngle, yaw));
 		}
@@ -304,10 +304,10 @@ public class autoraonJava1 extends LinearOpMode {
 //			left2.setPower(power * ((((y - x) * Kp * error) - rx) / denominator));
 //			right1.setPower(power * ((((y - x) * Kp * error) + rx) / denominator));
 //			right2.setPower(power * ((((y + x) * Kp * error) - rx) / denominator));
-			left1.setPower(power * ((((y + x) - left1.getCurrentPosition()) + rx) / denominator));
-			left2.setPower(power * ((((y - x) - left2.getCurrentPosition()) - rx) / denominator));
-			right1.setPower(power * ((((y - x) - right1.getCurrentPosition()) + rx) / denominator));
-			right2.setPower(power * ((((y + x) - right2.getCurrentPosition()) - rx) / denominator));
+			left1.setPower(((((y + x) - left1.getCurrentPosition()) + rx) / denominator));
+			left2.setPower(((((y - x) - left2.getCurrentPosition()) - rx) / denominator));
+			right1.setPower(((((y - x) - right1.getCurrentPosition()) + rx) / denominator));
+			right2.setPower(((((y + x) - right2.getCurrentPosition()) - rx) / denominator));
 //			left1.setPower(power * ((error) + rx) / Math.abs(dist));
 //			left2.setPower(power * ((error) - rx) / Math.abs(dist));
 //			right1.setPower(power * ((error) + rx) / Math.abs(dist));
@@ -369,11 +369,11 @@ public class autoraonJava1 extends LinearOpMode {
 			while (opModeIsActive()) { // 반복
 				callIMU();
 
-//				Move3(0, COUNTS_PER_INCH * 10, 0);
+
 
 				autonomus();
 
-				sleep(5000);
+//				sleep(5000);
 
 				telemetry.update();
 			}
@@ -381,6 +381,13 @@ public class autoraonJava1 extends LinearOpMode {
 	}
 
 	private void autonomus() {
+		if (isBasket == false) {
+			Move3(0, COUNTS_PER_INCH * 24, 0);
+			sleep(20);
+			mecanmTurnCCW(90); ///////////////////// 확인
+			sleep(20);
+		}
+
 		myAprilTagDetections = myAprilTagProcessor.getDetections();
 		for (AprilTagDetection item : myAprilTagDetections) {
 			aprilTag = item;
@@ -389,11 +396,7 @@ public class autoraonJava1 extends LinearOpMode {
 				if (isParking == false) {
 					if (isBasket == false) {
 						isBasket = true;
-						Move3(0, COUNTS_PER_INCH * 24, 0);
-						sleep(1000);
-						mecanmTurnCCW(-90); ///////////////////// 확인
-						sleep(1000);
-						
+
 						scoring_basket(aprilTag);
 						continue;
 					}
@@ -412,15 +415,15 @@ public class autoraonJava1 extends LinearOpMode {
 			callIMU();
 
 
-			Move3(0, tag.ftcPose.range - (24 * COUNTS_PER_INCH), 0);
-			sleep(1000);
+			Move3(0, COUNTS_PER_INCH * (tag.ftcPose.range - 24), 0);
+			sleep(20);
 			alignWithAprilTag(tag);
-			mecanmTurnCCW(-45);
+			mecanmTurnCCW(45);
 			// 팔 움직이는 코드
-			sleep(1000);
+			sleep(20);
 			//
 			// ↖ : ←  ↓
-			mecanmTurnCCW(-(45+90));
+			mecanmTurnCCW(5 + (45+90));
 		}
 	}
 
@@ -434,9 +437,9 @@ public class autoraonJava1 extends LinearOpMode {
 //      Move2(1, 0, COUNTS_PER_INCH * 25, 0);
 			// 테스트 해보고 거리조절
 			Move3(0, COUNTS_PER_INCH * (tag.ftcPose.range - 10), tag.ftcPose.bearing);
-			sleep(1000);
+			sleep(20);
 			alignWithAprilTag(tag);
-			sleep(1000);
+			sleep(20);
 			// X값이 -인지 확인하기
 			Move3(COUNTS_PER_INCH * 20, 0, 0);
 		}
