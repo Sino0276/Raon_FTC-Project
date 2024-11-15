@@ -57,7 +57,7 @@ public class autoraonJava1 extends LinearOpMode {
 	double integralSum;
 	double lastError;
 	ElapsedTime timer;
-	int sleepTime;
+	double weight;
 
 	private void _initHardWareMap() {
 		left1 = hardwareMap.get(DcMotor.class, "left1");
@@ -304,10 +304,10 @@ public class autoraonJava1 extends LinearOpMode {
 //			left2.setPower(power * ((((y - x) * Kp * error) - rx) / denominator));
 //			right1.setPower(power * ((((y - x) * Kp * error) + rx) / denominator));
 //			right2.setPower(power * ((((y + x) * Kp * error) - rx) / denominator));
-			left1.setPower(((((y + x) - left1.getCurrentPosition()) + rx) / denominator) + 0.2);
-			left2.setPower(((((y - x) - left2.getCurrentPosition()) - rx) / denominator) + 0.2);
-			right1.setPower(((((y - x) - right1.getCurrentPosition()) + rx) / denominator) + 0.2);
-			right2.setPower(((((y + x) - right2.getCurrentPosition()) - rx) / denominator) + 0.2);
+			left1.setPower(((((y + x) - left1.getCurrentPosition()) + rx) / denominator));
+			left2.setPower(((((y - x) - left2.getCurrentPosition()) - rx) / denominator));
+			right1.setPower(((((y - x) - right1.getCurrentPosition()) + rx) / denominator));
+			right2.setPower(((((y + x) - right2.getCurrentPosition()) - rx) / denominator));
 //			left1.setPower(power * ((error) + rx) / Math.abs(dist));
 //			left2.setPower(power * ((error) - rx) / Math.abs(dist));
 //			right1.setPower(power * ((error) + rx) / Math.abs(dist));
@@ -354,8 +354,7 @@ public class autoraonJava1 extends LinearOpMode {
 		// 카메라 사용여부
 		USE_WEBCAM = true;
 		power = 0.6;
-		turnSpeed = 0.5;
-		sleepTime = 100;
+		turnSpeed = 0.4;
 
 		// 초기화
 		_initHardWareMap();
@@ -384,9 +383,9 @@ public class autoraonJava1 extends LinearOpMode {
 	private void autonomus() {
 		if (isBasket == false) {
 			Move3(0, COUNTS_PER_INCH * 24, 0);
-			sleep(sleepTime);
+			sleep(20);
 			mecanmTurnCCW(90); ///////////////////// 확인
-			sleep(sleepTime);
+			sleep(20);
 		}
 
 		myAprilTagDetections = myAprilTagProcessor.getDetections();
@@ -417,11 +416,11 @@ public class autoraonJava1 extends LinearOpMode {
 
 
 			Move3(0, COUNTS_PER_INCH * (tag.ftcPose.range - 24), 0);
-			sleep(sleepTime);
+			sleep(20);
 			alignWithAprilTag(tag);
 			mecanmTurnCCW(45);
 			// 팔 움직이는 코드
-			sleep(sleepTime);
+			sleep(20);
 			//
 			// ↖ : ←  ↓
 			mecanmTurnCCW(5 + (45+90));
@@ -438,9 +437,9 @@ public class autoraonJava1 extends LinearOpMode {
 //      Move2(1, 0, COUNTS_PER_INCH * 25, 0);
 			// 테스트 해보고 거리조절
 			Move3(0, COUNTS_PER_INCH * (tag.ftcPose.range - 10), tag.ftcPose.bearing);
-			sleep(sleepTime);
+			sleep(20);
 			alignWithAprilTag(tag);
-			sleep(sleepTime);
+			sleep(20);
 			// X값이 -인지 확인하기
 			Move3(COUNTS_PER_INCH * 20, 0, 0);
 		}
