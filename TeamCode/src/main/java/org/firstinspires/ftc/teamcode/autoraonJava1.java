@@ -237,41 +237,6 @@ public class autoraonJava1 extends LinearOpMode {
 		return out;
 	}
 
-	private void armController() {
-		
-	}
-
-	/**
-	 * dist == 인코더 값
-	 * CONUTS_PER_INCH * n = n인치 이동 가량의 인코더 값
-	 */
-	private void Move2(double x, double y, double dist, double targetAngle) {
-		x = Math.abs(power) * x;
-		y = Math.abs(power) * y;
-		rx = 0;
-		denominator = JavaUtil.maxOfList(JavaUtil.createListWith(JavaUtil.sumOfList(JavaUtil.createListWith(Math.abs(y), Math.abs(x), Math.abs(rx))), 1));
-		// 인코더 계산을 위한 용도로 초기화
-		resetMotor();
-		resetPID();
-		// 바퀴 4개의 인코더 값의 합 / 4 == 바퀴 4개 인코더 값의 평균
-		// 평균 - 목표거리 == 오차
-		// 오차의 절대값 > 허용오차(1인치)
-		while (opModeIsActive() && Math.abs(left1.getCurrentPosition() - dist) > COUNTS_PER_INCH) {
-			callIMU();
-			rx = PIDController(targetAngle, yaw);
-			denominator = JavaUtil.maxOfList(JavaUtil.createListWith(JavaUtil.sumOfList(JavaUtil.createListWith(Math.abs(y), Math.abs(x), Math.abs(rx))), 1));
-			left1.setPower((Range.clip((y + x) * -Kp * (left1.getCurrentPosition() - dist), -power, power) + rx) / denominator);
-			left2.setPower((Range.clip((y - x) * -Kp * (left1.getCurrentPosition() - dist), -power, power) - rx) / denominator);
-			right1.setPower((Range.clip((y - x) * -Kp * (left1.getCurrentPosition() - dist), -power, power) + rx) / denominator);
-			right2.setPower((Range.clip((y + x) * -Kp * (left1.getCurrentPosition() - dist), -power, power) - rx) / denominator);
-			telemetry.addData("l1", left1.getCurrentPosition());
-			telemetry.update();
-		}
-		left1.setPower(0);
-		left2.setPower(0);
-		right1.setPower(0);
-		right2.setPower(0);
-	}
 
 	/**
 	 * double x = x_targetDist
@@ -300,18 +265,10 @@ public class autoraonJava1 extends LinearOpMode {
 			rx = PIDController(targetAngle, yaw);
 			denominator = JavaUtil.maxOfList(JavaUtil.createListWith(JavaUtil.sumOfList(JavaUtil.createListWith(Math.abs(y), Math.abs(x), Math.abs(rx))), 1));
 
-//			left1.setPower(power * ((((y + x) * Kp * error) + rx) / denominator));
-//			left2.setPower(power * ((((y - x) * Kp * error) - rx) / denominator));
-//			right1.setPower(power * ((((y - x) * Kp * error) + rx) / denominator));
-//			right2.setPower(power * ((((y + x) * Kp * error) - rx) / denominator));
-			left1.setPower(((((y + x) - left1.getCurrentPosition()) + rx) / denominator));
-			left2.setPower(((((y - x) - left2.getCurrentPosition()) - rx) / denominator));
-			right1.setPower(((((y - x) - right1.getCurrentPosition()) + rx) / denominator));
-			right2.setPower(((((y + x) - right2.getCurrentPosition()) - rx) / denominator));
-//			left1.setPower(power * ((error) + rx) / Math.abs(dist));
-//			left2.setPower(power * ((error) - rx) / Math.abs(dist));
-//			right1.setPower(power * ((error) + rx) / Math.abs(dist));
-//			right2.setPower(power * ((error) - rx) / Math.abs(dist));
+			left1.setPower(((((y + x) - left1.getCurrentPosition()) + rx) / denominator) + 0.2);
+			left2.setPower(((((y - x) - left2.getCurrentPosition()) - rx) / denominator) + 0.2);
+			right1.setPower(((((y - x) - right1.getCurrentPosition()) + rx) / denominator) + 0.2);
+			right2.setPower(((((y + x) - right2.getCurrentPosition()) - rx) / denominator) + 0.2);
 
 			telemetry.addData("left1", left1.getCurrentPosition());
 			telemetry.update();
@@ -372,8 +329,7 @@ public class autoraonJava1 extends LinearOpMode {
 
 
 				autonomus();
-
-//				sleep(5000);
+				
 
 				telemetry.update();
 			}
