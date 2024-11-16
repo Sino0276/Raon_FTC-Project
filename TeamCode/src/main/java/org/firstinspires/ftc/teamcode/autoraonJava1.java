@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -33,6 +34,8 @@ public class autoraonJava1 extends LinearOpMode {
 	private DcMotor right2;
 	private DcMotor arm_angle;
 	private DcMotor arm_length;
+	private Servo finger;
+	private Servo hand;
 
 	private IMU imu;
 	double yaw;
@@ -43,6 +46,7 @@ public class autoraonJava1 extends LinearOpMode {
 	AprilTagProcessor myAprilTagProcessor;
 
 	double COUNTS_PER_INCH;
+	int armAngleRev;    // 팔이 한바퀴 돌기 위해 필요한 인코더 값
 
 	double rx;
 
@@ -57,7 +61,7 @@ public class autoraonJava1 extends LinearOpMode {
 	double integralSum;
 	double lastError;
 	ElapsedTime timer;
-	double weight;
+	int sleepTime;
 
 	private void _initHardWareMap() {
 		left1 = hardwareMap.get(DcMotor.class, "left1");
@@ -67,6 +71,8 @@ public class autoraonJava1 extends LinearOpMode {
 		imu = hardwareMap.get(IMU.class, "imu");
 		arm_angle = hardwareMap.get(DcMotor.class, "arm_angle");
 		arm_length = hardwareMap.get(DcMotor.class, "arm_length");
+		hand = hardwareMap.get(Servo.class, "hand");
+		finger = hardwareMap.get(Servo.class, "finger");
 	}
 
 	private void _initAprilTag() {
@@ -125,8 +131,8 @@ public class autoraonJava1 extends LinearOpMode {
 		// 모드 초기화(팔)
 		arm_angle.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		arm_length.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-		arm_angle.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-		arm_length.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//		arm_angle.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//		arm_length.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 		telemetry.addData("모터 초기화 됨", "대기중...");
 		telemetry.update();
 	}
@@ -237,6 +243,31 @@ public class autoraonJava1 extends LinearOpMode {
 		return out;
 	}
 
+	private void setArmLength(int encoder) {
+		arm_length.setTargetPosition(encoder);
+		arm_length.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+	}
+
+	/**0 ~ 13425 (360도)
+	 * 6712.5 (180도)
+	 * 3356.25 (90도)
+	 * . . .**/
+	private void setArmAngle(int angle) {
+		int encoder = armAngleRev * angle / 360;
+		arm_angle.setTargetPosition(encoder);
+		arm_angle.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+	}
+
+	public void movefinger(boolean value) {
+		if (value) { finger.setPosition(1); }   // true     먹기
+		else { finger.setPosition(0); }         // false    뱉기 (퉤!)
+	}
+
+	/**값 조절 할 것!**/
+	public void moveHand(boolean value) {
+		if (value) { hand.setPosition(0.7); }     // true     돌리기
+		else { hand.setPosition(0.388); }           // false    원점
+	}
 
 	/**
 	 * double x = x_targetDist
@@ -305,13 +336,15 @@ public class autoraonJava1 extends LinearOpMode {
 		double DRIVE_GEAR_REDUCTION = 1;
 		double WHEEL_DIAMETER_INCHES = 3.7;
 		COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * Math.PI);
+		armAngleRev = 13425;
 
 		isParking = false;
 		isBasket = false;
 		// 카메라 사용여부
 		USE_WEBCAM = true;
 		power = 0.6;
-		turnSpeed = 0.4;
+		turnSpeed = 0.5;
+		sleepTime = 100;
 
 		// 초기화
 		_initHardWareMap();
@@ -328,8 +361,11 @@ public class autoraonJava1 extends LinearOpMode {
 
 
 
-				autonomus();
-				
+//				autonomus();
+				arm_angle.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+				arm_angle.setTargetPosition(-3000);
+				arm_angle.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+				sleep(5000);
 
 				telemetry.update();
 			}
@@ -339,9 +375,9 @@ public class autoraonJava1 extends LinearOpMode {
 	private void autonomus() {
 		if (isBasket == false) {
 			Move3(0, COUNTS_PER_INCH * 24, 0);
-			sleep(20);
+			sleep(sleepTime);
 			mecanmTurnCCW(90); ///////////////////// 확인
-			sleep(20);
+			sleep(sleepTime);
 		}
 
 		myAprilTagDetections = myAprilTagProcessor.getDetections();
@@ -372,12 +408,24 @@ public class autoraonJava1 extends LinearOpMode {
 
 
 			Move3(0, COUNTS_PER_INCH * (tag.ftcPose.range - 24), 0);
-			sleep(20);
+			sleep(sleepTime);
 			alignWithAprilTag(tag);
 			mecanmTurnCCW(45);
 			// 팔 움직이는 코드
-			sleep(20);
+			sleep(sleepTime);
 			//
+			setArmAngle(180);
+			sleep(1000);
+			moveHand(false);		// 수정하기
+			sleep(500);
+			arm_angle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+			sleep(100);
+			arm_angle.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+			movefinger(true);
+			sleep(500);
+			setArmAngle(10);
+			sleep(2000);
+
 			// ↖ : ←  ↓
 			mecanmTurnCCW(5 + (45+90));
 		}
@@ -393,9 +441,9 @@ public class autoraonJava1 extends LinearOpMode {
 //      Move2(1, 0, COUNTS_PER_INCH * 25, 0);
 			// 테스트 해보고 거리조절
 			Move3(0, COUNTS_PER_INCH * (tag.ftcPose.range - 10), tag.ftcPose.bearing);
-			sleep(20);
+			sleep(sleepTime);
 			alignWithAprilTag(tag);
-			sleep(20);
+			sleep(sleepTime);
 			// X값이 -인지 확인하기
 			Move3(COUNTS_PER_INCH * 20, 0, 0);
 		}
