@@ -59,6 +59,18 @@ public class autoraonJava1 extends LinearOpMode {
 	ElapsedTime timer;
 	int sleepTime;
 
+	private void _init() {
+		_initHardWareMap();
+		_initAprilTag();
+		telemetry.update();
+
+		mecanumCtrl = new MecanumController(this, left1, left2, right1, right2, 537, 1, 3.7);
+		armCtrl = new ArmController(this, 13425, 1.0, 0.8, arm_length, arm_angle);
+		handCtrl = new HandController(this, hand, finger);
+		PIDCtrl = new PIDController(this);
+		IMUCtrl = new IMUController(this, imu);
+	}
+
 	private void _initHardWareMap() {
 		left1 = hardwareMap.get(DcMotor.class, "left1");
 		left2 = hardwareMap.get(DcMotor.class, "left2");
@@ -341,6 +353,15 @@ public class autoraonJava1 extends LinearOpMode {
 		}
 	}
 
+<<<<<<< Updated upstream
+=======
+	MecanumController mecanumCtrl;
+	ArmController armCtrl;
+	HandController handCtrl;
+	PIDController PIDCtrl;
+	IMUController IMUCtrl;
+
+>>>>>>> Stashed changes
 	@Override
 	public void runOpMode() {
 		// 인치당 인코더
@@ -358,12 +379,16 @@ public class autoraonJava1 extends LinearOpMode {
 		sleepTime = 100;
 
 		// 초기화
+<<<<<<< Updated upstream
 		_initHardWareMap();
 		_initPID();
 		_initAprilTag();
 		_initMotor();
 		_initIMU();
 		telemetry.update();
+=======
+		_init();
+>>>>>>> Stashed changes
 		waitForStart();
 		if (opModeIsActive()) {
 			// Put run blocks here.
