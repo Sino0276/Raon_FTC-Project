@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+import static org.firstinspires.ftc.teamcode.Utilities.angleWrap;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -8,13 +9,13 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
-public class MecanumController {
-	private autoraonJava1 main;
+public class MecanumController extends Utilities {
+	private autoraonJava2 main;
 	// 인치당 인코더
-	double COUNTS_PER_MOTOR_REV = 537;
-	double DRIVE_GEAR_REDUCTION = 1;
-	double WHEEL_DIAMETER_INCHES = 3.7;
-	public double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * Math.PI);
+//	double COUNTS_PER_MOTOR_REV = 537;
+//	double DRIVE_GEAR_REDUCTION = 1;
+//	double WHEEL_DIAMETER_INCHES = 3.7;
+//	public static double COUNTS_PER_INCH;/* = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * Math.PI);*/
 	double power = 0.6;
 	double turnSpeed = 0.4;
 	double denominator;
@@ -24,7 +25,7 @@ public class MecanumController {
 	DcMotor right2;
 
 	public MecanumController
-			(autoraonJava1 main, DcMotor left1, DcMotor left2, DcMotor right1, DcMotor right2, double encoder_Per_MotorRev, double driveGear_Reduction, double wheel_Inch) {
+			(autoraonJava2 main, DcMotor left1, DcMotor left2, DcMotor right1, DcMotor right2, double encoder_Per_MotorRev, double driveGear_Reduction, double wheel_Inch) {
 		this.main = main;
 		this.left1 = left1;
 		this.left2 = left2;
@@ -33,6 +34,8 @@ public class MecanumController {
 		this.COUNTS_PER_MOTOR_REV = encoder_Per_MotorRev;
 		this.DRIVE_GEAR_REDUCTION = driveGear_Reduction;
 		this.WHEEL_DIAMETER_INCHES = wheel_Inch;
+
+		COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * Math.PI);
 
 		_initMotor();
 	}
@@ -113,10 +116,10 @@ public class MecanumController {
 			rx = main.PIDCtrl.PIDControl(targetAngle, main.IMUCtrl.yaw);
 			denominator = JavaUtil.maxOfList(JavaUtil.createListWith(JavaUtil.sumOfList(JavaUtil.createListWith(Math.abs(y), Math.abs(x), Math.abs(rx))), 1));
 
-			left1.setPower(((((y + x) - left1.getCurrentPosition()) + rx) / denominator) + 0.2);
-			left2.setPower(((((y - x) - left2.getCurrentPosition()) - rx) / denominator) + 0.2);
-			right1.setPower(((((y - x) - right1.getCurrentPosition()) + rx) / denominator) + 0.2);
-			right2.setPower(((((y + x) - right2.getCurrentPosition()) - rx) / denominator) + 0.2);
+			left1.setPower(((((y + x) - left1.getCurrentPosition()) + rx) / denominator) + 0.1);
+			left2.setPower(((((y - x) - left2.getCurrentPosition()) - rx) / denominator) + 0.1);
+			right1.setPower(((((y - x) - right1.getCurrentPosition()) + rx) / denominator) + 0.1);
+			right2.setPower(((((y + x) - right2.getCurrentPosition()) - rx) / denominator) + 0.1);
 
 			telemetry.addData("left1", left1.getCurrentPosition());
 			telemetry.update();
@@ -153,15 +156,4 @@ public class MecanumController {
 		EncoderAvg = (left1.getCurrentPosition() + left2.getCurrentPosition() + right1.getCurrentPosition() + right2.getCurrentPosition()) / 4;
 	}
 
-	private double angleWrap(double wrappingAngle) {
-		while (wrappingAngle > 180) {
-			wrappingAngle = wrappingAngle - 360;
-		}
-		while (wrappingAngle < -180) {
-			wrappingAngle = wrappingAngle + 360;
-		}
-		return wrappingAngle;
-	}
-
-	public int inchToEncoder(double inch) { return (int)(inch * COUNTS_PER_INCH); }     // 강제 형 변환
 }

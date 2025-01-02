@@ -1,15 +1,14 @@
-package org.firstinspires.ftc.teamcode.PID;
+package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+import static org.firstinspires.ftc.teamcode.Utilities.angleWrap;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.autoraonJava1;
-
 public class PIDController {
-	private autoraonJava1 main;
+	private autoraonJava2 main;
 	double Kp;
 	double Ki;
 	double Kd;
@@ -18,7 +17,7 @@ public class PIDController {
 	ElapsedTime timer;
 	MultipleTelemetry tmt = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-	public PIDController(autoraonJava1 main) {
+	public PIDController(autoraonJava2 main) {
 		this.main = main;
 		_initPID();
 	}
@@ -62,16 +61,6 @@ public class PIDController {
 		integralSum = 0;
 		lastError = 0;
 		timer.reset();
-	}
-
-	private double angleWrap(double wrappingAngle) {
-		while (wrappingAngle > 180) {
-			wrappingAngle = wrappingAngle - 360;
-		}
-		while (wrappingAngle < -180) {
-			wrappingAngle = wrappingAngle + 360;
-		}
-		return wrappingAngle;
 	}
 
 }

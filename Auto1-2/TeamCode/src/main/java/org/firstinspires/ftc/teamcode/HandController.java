@@ -3,13 +3,12 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class HandController {
+	autoraonJava2 main;
 	Servo finger;
 	Servo hand;
 
-	autoraonJava1 _main;
-
-	public HandController(autoraonJava1 main, Servo finger, Servo hand) {
-		this._main = main;
+	public HandController(autoraonJava2 main, Servo finger, Servo hand) {
+		this.main = main;
 		this.finger = finger;
 		this.hand = hand;
 	}

@@ -10,12 +10,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 public class IMUController {
-	private autoraonJava1 main;
+	private autoraonJava2 main;
 	IMU imu;
 	double yaw;
 
 
-	public IMUController(autoraonJava1 main, IMU imu) {
+	public IMUController(autoraonJava2 main, IMU imu) {
 		this.main = main;
 		this.imu = imu;
 
