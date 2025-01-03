@@ -1,24 +1,31 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+//import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static org.firstinspires.ftc.teamcode.Utilities.angleWrap;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 public class PIDController {
 	private autoraonJava2 main;
+	private Telemetry telemetry;
 	double Kp;
 	double Ki;
 	double Kd;
 	double integralSum;
 	double lastError;
 	ElapsedTime timer;
-	MultipleTelemetry tmt = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+	MultipleTelemetry tmt;/* = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());*/
 
-	public PIDController(autoraonJava2 main) {
+	public PIDController(autoraonJava2 main, Telemetry telemetry) {
 		this.main = main;
+		this.telemetry = telemetry;
+
+		tmt = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
 		_initPID();
 	}
 

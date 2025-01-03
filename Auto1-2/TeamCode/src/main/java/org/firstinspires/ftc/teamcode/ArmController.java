@@ -4,8 +4,11 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.tel
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 public class ArmController {
 	private autoraonJava2 main;
+	private Telemetry telemetry;
 	int armAngleRev;    // 팔이 한바퀴 돌기 위해 필요한 인코더 값
 	double armLengthSpeed = 1.0;
 	double armAngleSpeed = 1.0;
@@ -13,8 +16,9 @@ public class ArmController {
 	DcMotor armAngle;
 
 	public ArmController
-			(autoraonJava2 main, int armLengthRev, double lengthSpeed, double angleSpeed, DcMotor armLength, DcMotor armAngle) {
+			(autoraonJava2 main, Telemetry telemetry, int armLengthRev, double lengthSpeed, double angleSpeed, DcMotor armLength, DcMotor armAngle) {
 		this.main = main;
+		this.telemetry = telemetry;
 		this.armAngleRev = armLengthRev;
 		this.armLengthSpeed = lengthSpeed;
 		this.armAngleSpeed = angleSpeed;
@@ -36,8 +40,8 @@ public class ArmController {
 		armLength.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		armAngle.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 		armLength.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-		telemetry.addData("팔 초기화 됨", "대기중...");
-		telemetry.update();
+//		telemetry.addData("팔 초기화 됨", "대기중...");
+//		telemetry.update();
 	}
 
 	public void setArmLength(int encoder) {

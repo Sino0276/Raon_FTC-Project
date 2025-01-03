@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import java.util.List;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -18,9 +19,9 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import static org.firstinspires.ftc.teamcode.Utilities.*;
 
-@Autonomous(name = "autoraonJava1")
+@Autonomous(name = "autoraonJava2")
 public class autoraonJava2 extends LinearOpMode{
-	MultipleTelemetry tmt = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+	//MultipleTelemetry multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
 	private DcMotor left1;
 	private DcMotor left2;
@@ -47,11 +48,11 @@ public class autoraonJava2 extends LinearOpMode{
 		_initAprilTag();
 		telemetry.update();
 
-		mecanumCtrl = new MecanumController(this, left1, left2, right1, right2, 537, 1, 3.7);
-		armCtrl = new ArmController(this, 13425, 1.0, 0.8, arm_length, arm_angle);
-		handCtrl = new HandController(this, hand, finger);
-		PIDCtrl = new PIDController(this);
-		IMUCtrl = new IMUController(this, imu);
+		mecanumCtrl = new MecanumController(this, telemetry, left1, left2, right1, right2, 537, 1, 3.7);
+		armCtrl = new ArmController(this, telemetry, 13425, 1.0, 0.8, arm_length, arm_angle);
+		handCtrl = new HandController(this, telemetry, hand, finger);
+		PIDCtrl = new PIDController(this, telemetry);
+		IMUCtrl = new IMUController(this, telemetry, imu);
 	}
 
 	private void _initHardWareMap() {
@@ -120,7 +121,9 @@ public class autoraonJava2 extends LinearOpMode{
 			while (opModeIsActive()) { // 반복
 				IMUCtrl.callIMU();
 
-				autonomus();
+				mecanumCtrl.mecanumMove(0, inchToEncoder(10), 0);
+				sleep(sleepTime);
+				//autonomus();
 
 				telemetry.update();
 			}

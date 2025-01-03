@@ -5,18 +5,21 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.tel
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 public class IMUController {
 	private autoraonJava2 main;
+	private Telemetry telemetry;
 	IMU imu;
 	double yaw;
 
 
-	public IMUController(autoraonJava2 main, IMU imu) {
+	public IMUController(autoraonJava2 main, Telemetry telemetry, IMU imu) {
 		this.main = main;
+		this.telemetry = telemetry;
 		this.imu = imu;
 
 		_initIMU();

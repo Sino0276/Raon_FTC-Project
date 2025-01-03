@@ -2,13 +2,17 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 public class HandController {
-	autoraonJava2 main;
+	private autoraonJava2 main;
+	private Telemetry telemetry;
 	Servo finger;
 	Servo hand;
 
-	public HandController(autoraonJava2 main, Servo finger, Servo hand) {
+	public HandController(autoraonJava2 main, Telemetry telemetry, Servo finger, Servo hand) {
 		this.main = main;
+		this.telemetry = telemetry;
 		this.finger = finger;
 		this.hand = hand;
 	}
