@@ -7,14 +7,14 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class HandController {
 	private autoraonJava2 main;
 	private Telemetry telemetry;
-	Servo finger;
-	Servo hand;
+	private Servo finger;
+	private Servo hand;
 
-	public HandController(autoraonJava2 main, Telemetry telemetry, Servo finger, Servo hand) {
+	public HandController(autoraonJava2 main, Servo finger, Servo hand) {
 		this.main = main;
-		this.telemetry = telemetry;
 		this.finger = finger;
 		this.hand = hand;
+		this.telemetry = main.telemetry;
 	}
 
 	public void movefinger(boolean value) {

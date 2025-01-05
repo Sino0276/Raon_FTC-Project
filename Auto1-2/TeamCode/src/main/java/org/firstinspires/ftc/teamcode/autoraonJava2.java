@@ -23,49 +23,52 @@ import static org.firstinspires.ftc.teamcode.Utilities.*;
 public class autoraonJava2 extends LinearOpMode{
 	//MultipleTelemetry multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-	private DcMotor left1;
-	private DcMotor left2;
-	private DcMotor right1;
-	private DcMotor right2;
-	private DcMotor arm_angle;
-	private DcMotor arm_length;
-	private Servo finger;
-	private Servo hand;
+	// public? private?
+	// HardwareSystem이라는 Manager급 클래스 (고려)
+	private final DcMotor left1 = hardwareMap.get(DcMotor.class, "left1");
+	private final DcMotor left2 = hardwareMap.get(DcMotor.class, "left2");
+	private final DcMotor right1 = hardwareMap.get(DcMotor.class, "right1");
+	private final DcMotor right2 = hardwareMap.get(DcMotor.class, "right2");
+	private final DcMotor arm_angle = hardwareMap.get(DcMotor.class, "arm_angle");
+	private final DcMotor arm_length = hardwareMap.get(DcMotor.class, "arm_length");
+	private final Servo finger = hardwareMap.get(Servo.class, "finger");
+	private final Servo hand = hardwareMap.get(Servo.class, "hand");
+	public final IMU imu = hardwareMap.get(IMU.class, "imu");
 
-	public IMU imu;
 	List<AprilTagDetection> myAprilTagDetections;
-	boolean isParking;
-	boolean isBasket;
+	private boolean isParking;
+	private boolean isBasket;
 	AprilTagDetection aprilTag;
 	AprilTagProcessor myAprilTagProcessor;
 
-	boolean USE_WEBCAM;
+	private boolean USE_WEBCAM;
 
-	int sleepTime;
+	private int sleepTime;
 
 	private void _init() {
-		_initHardWareMap();
+//		_initHardWareMap();
 		_initAprilTag();
 		telemetry.update();
 
-		mecanumCtrl = new MecanumController(this, telemetry, left1, left2, right1, right2, 537, 1, 3.7);
-		armCtrl = new ArmController(this, telemetry, 13425, 1.0, 0.8, arm_length, arm_angle);
-		handCtrl = new HandController(this, telemetry, hand, finger);
-		PIDCtrl = new PIDController(this, telemetry);
-		IMUCtrl = new IMUController(this, telemetry, imu);
+		mecanumCtrl = new MecanumController(this, left1, left2, right1, right2);
+		armCtrl = new ArmController(this, arm_length, arm_angle);
+		handCtrl = new HandController(this, hand, finger);
+		PIDCtrl = new PIDController(this);
+		IMUCtrl = new IMUController(this);
+
 	}
 
-	private void _initHardWareMap() {
-		left1 = hardwareMap.get(DcMotor.class, "left1");
-		left2 = hardwareMap.get(DcMotor.class, "left2");
-		right1 = hardwareMap.get(DcMotor.class, "right1");
-		right2 = hardwareMap.get(DcMotor.class, "right2");
-		imu = hardwareMap.get(IMU.class, "imu");
-		arm_angle = hardwareMap.get(DcMotor.class, "arm_angle");
-		arm_length = hardwareMap.get(DcMotor.class, "arm_length");
-		hand = hardwareMap.get(Servo.class, "hand");
-		finger = hardwareMap.get(Servo.class, "finger");
-	}
+//	private void _initHardWareMap() {
+//		left1 = hardwareMap.get(DcMotor.class, "left1");
+//		left2 = hardwareMap.get(DcMotor.class, "left2");
+//		right1 = hardwareMap.get(DcMotor.class, "right1");
+//		right2 = hardwareMap.get(DcMotor.class, "right2");
+//		imu = hardwareMap.get(IMU.class, "imu");
+//		arm_angle = hardwareMap.get(DcMotor.class, "arm_angle");
+//		arm_length = hardwareMap.get(DcMotor.class, "arm_length");
+//		hand = hardwareMap.get(Servo.class, "hand");
+//		finger = hardwareMap.get(Servo.class, "finger");
+//	}
 
 	private void _initAprilTag() {
 		AprilTagProcessor.Builder myAprilTagProcessorBuilder;
@@ -110,7 +113,7 @@ public class autoraonJava2 extends LinearOpMode{
 	public void runOpMode() {
 		isParking = false;
 		isBasket = false;
-		// 카메라 사용여부
+		// 카메라 사용 여부
 		USE_WEBCAM = true;
 		// 초기화
 		_init();

@@ -11,16 +11,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 public class IMUController {
+	// 여기
 	private autoraonJava2 main;
+	private IMU imu;
 	private Telemetry telemetry;
-	IMU imu;
-	double yaw;
+	private double yaw;
 
 
-	public IMUController(autoraonJava2 main, Telemetry telemetry, IMU imu) {
+	public IMUController(autoraonJava2 main) {
 		this.main = main;
-		this.telemetry = telemetry;
-		this.imu = imu;
+
+		imu = main.imu;
+		telemetry = main.telemetry;
 
 		_initIMU();
 	}
@@ -30,6 +32,8 @@ public class IMUController {
 		imu.resetYaw();
 		telemetry.addData("IMU 초기화 됨", "시작 대기중");
 	}
+
+	public double getYaw() { return yaw; }
 
 	public void callIMU() {
 		YawPitchRollAngles orientation;

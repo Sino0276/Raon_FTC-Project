@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-//import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static org.firstinspires.ftc.teamcode.Utilities.angleWrap;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -10,21 +9,23 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class PIDController {
-	private autoraonJava2 main;
-	private Telemetry telemetry;
-	double Kp;
-	double Ki;
-	double Kd;
-	double integralSum;
-	double lastError;
-	ElapsedTime timer;
-	MultipleTelemetry tmt;/* = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());*/
+	// 여기
+	public autoraonJava2 main;
+	private double Kp;
+	private double Ki;
+	private double Kd;
+	private double integralSum;
+	private double lastError;
+	private ElapsedTime timer;
+	// 여기
+	public Telemetry telemetry;
+	public MultipleTelemetry multiTelemetry;
 
-	public PIDController(autoraonJava2 main, Telemetry telemetry) {
+	public PIDController(autoraonJava2 main) {
 		this.main = main;
-		this.telemetry = telemetry;
 
-		tmt = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+		telemetry = main.telemetry;
+		multiTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
 		_initPID();
 	}
@@ -47,8 +48,8 @@ public class PIDController {
 		double derivative;
 		double out;
 
-		tmt.addData("목표 IMU Angle", reference);
-		tmt.addData("현재 IMU Angle", now);
+		multiTelemetry.addData("목표 IMU Angle", reference);
+		multiTelemetry.addData("현재 IMU Angle", now);
 
 		error = angleWrap(reference - now);
 		derivative = (error - lastError) / timer.milliseconds();
@@ -58,7 +59,7 @@ public class PIDController {
 		lastError = error;
 		timer.reset();
 
-		tmt.update();
+		multiTelemetry.update();
 
 		return out;
 	}

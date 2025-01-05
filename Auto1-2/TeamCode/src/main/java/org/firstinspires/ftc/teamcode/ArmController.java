@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+import static org.firstinspires.ftc.teamcode.Utilities.armAngleRev;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -9,21 +10,18 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class ArmController {
 	private autoraonJava2 main;
 	private Telemetry telemetry;
-	int armAngleRev;    // 팔이 한바퀴 돌기 위해 필요한 인코더 값
-	double armLengthSpeed = 1.0;
-	double armAngleSpeed = 1.0;
-	DcMotor armLength;
-	DcMotor armAngle;
+	private double armLengthSpeed = 1.0;
+	private double armAngleSpeed = 0.8;
+	private DcMotor armLength;
+	private DcMotor armAngle;
 
 	public ArmController
-			(autoraonJava2 main, Telemetry telemetry, int armLengthRev, double lengthSpeed, double angleSpeed, DcMotor armLength, DcMotor armAngle) {
+			(autoraonJava2 main, DcMotor armLength, DcMotor armAngle) {
 		this.main = main;
-		this.telemetry = telemetry;
-		this.armAngleRev = armLengthRev;
-		this.armLengthSpeed = lengthSpeed;
-		this.armAngleSpeed = angleSpeed;
 		this.armLength = armLength;
 		this.armAngle = armAngle;
+
+		telemetry = main.telemetry;
 
 		_initArm();
 	}
