@@ -25,15 +25,15 @@ public class autoraonJava2 extends LinearOpMode{
 
 	// public? private?
 	// HardwareSystem이라는 Manager급 클래스 (고려)
-	private final DcMotor left1 = hardwareMap.get(DcMotor.class, "left1");
-	private final DcMotor left2 = hardwareMap.get(DcMotor.class, "left2");
-	private final DcMotor right1 = hardwareMap.get(DcMotor.class, "right1");
-	private final DcMotor right2 = hardwareMap.get(DcMotor.class, "right2");
-	private final DcMotor arm_angle = hardwareMap.get(DcMotor.class, "arm_angle");
-	private final DcMotor arm_length = hardwareMap.get(DcMotor.class, "arm_length");
-	private final Servo finger = hardwareMap.get(Servo.class, "finger");
-	private final Servo hand = hardwareMap.get(Servo.class, "hand");
-	public final IMU imu = hardwareMap.get(IMU.class, "imu");
+	private DcMotor left1;
+	private DcMotor left2;
+	private DcMotor right1;
+	private DcMotor right2;
+	private DcMotor arm_angle;
+	private DcMotor arm_length;
+	private Servo finger;
+	private Servo hand;
+	public IMU imu;
 
 	List<AprilTagDetection> myAprilTagDetections;
 	private boolean isParking;
@@ -46,7 +46,7 @@ public class autoraonJava2 extends LinearOpMode{
 	private int sleepTime;
 
 	private void _init() {
-//		_initHardWareMap();
+		_initHardWareMap();
 		_initAprilTag();
 		telemetry.update();
 
@@ -58,17 +58,17 @@ public class autoraonJava2 extends LinearOpMode{
 
 	}
 
-//	private void _initHardWareMap() {
-//		left1 = hardwareMap.get(DcMotor.class, "left1");
-//		left2 = hardwareMap.get(DcMotor.class, "left2");
-//		right1 = hardwareMap.get(DcMotor.class, "right1");
-//		right2 = hardwareMap.get(DcMotor.class, "right2");
-//		imu = hardwareMap.get(IMU.class, "imu");
-//		arm_angle = hardwareMap.get(DcMotor.class, "arm_angle");
-//		arm_length = hardwareMap.get(DcMotor.class, "arm_length");
-//		hand = hardwareMap.get(Servo.class, "hand");
-//		finger = hardwareMap.get(Servo.class, "finger");
-//	}
+	private void _initHardWareMap() {
+		left1 = hardwareMap.get(DcMotor.class, "left1");
+		left2 = hardwareMap.get(DcMotor.class, "left2");
+		right1 = hardwareMap.get(DcMotor.class, "right1");
+		right2 = hardwareMap.get(DcMotor.class, "right2");
+		imu = hardwareMap.get(IMU.class, "imu");
+		arm_angle = hardwareMap.get(DcMotor.class, "arm_angle");
+		arm_length = hardwareMap.get(DcMotor.class, "arm_length");
+		hand = hardwareMap.get(Servo.class, "hand");
+		finger = hardwareMap.get(Servo.class, "finger");
+	}
 
 	private void _initAprilTag() {
 		AprilTagProcessor.Builder myAprilTagProcessorBuilder;
