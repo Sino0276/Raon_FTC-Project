@@ -10,9 +10,8 @@ public class HandController {
 	private Servo finger;
 	private Servo hand;
 
-	public HandController(autoraonJava2 main, Servo finger, Servo hand) {
+	public HandController(autoraonJava2 main, Servo hand) {
 		this.main = main;
-		this.finger = finger;
 		this.hand = hand;
 		this.telemetry = main.telemetry;
 	}

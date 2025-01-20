@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.IMU;
 
@@ -21,7 +19,7 @@ public class IMUController {
 	public IMUController(autoraonJava2 main) {
 		this.main = main;
 
-		imu = main.imu;
+		imu = main.imu_0;
 		telemetry = main.telemetry;
 
 		_initIMU();

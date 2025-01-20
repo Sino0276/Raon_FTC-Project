@@ -68,7 +68,7 @@ public class MecanumController extends Utilities {
 	}
 
 	public void mecanmTurn(double targetAngle) {
-		main.imu.resetYaw();
+		main.imu_0.resetYaw();
 		main.PIDCtrl.resetPID();
 		// rx = -(Math.abs(power) * (targetAngle / Math.abs(targetAngle)));
 		while (Math.abs(angleWrap(targetAngle - main.IMUCtrl.getYaw())) > 1) {
