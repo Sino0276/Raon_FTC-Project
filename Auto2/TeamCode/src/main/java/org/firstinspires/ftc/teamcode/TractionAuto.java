@@ -23,7 +23,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
  *   </ul></li>
  * </ul>
  */
-@Autonomous(name = "TractionAuto", group = "")
+@Autonomous(name = "TractionAuto")
 public class TractionAuto extends LinearOpMode  {
     // Load the implementation of the program for your physical implementation of the traction here.
 //    private ITraction traction = new MecanumTraction();         // Mecanum, no PID heading correction
@@ -36,7 +36,7 @@ public class TractionAuto extends LinearOpMode  {
      * Station.
      */
     @Override
-    public void runOpMode()  throws java.lang.InterruptedException {
+    public void runOpMode()  /*throws java.lang.InterruptedException*/ {
         // initialize the traction base.
         traction.initialize(this);
 
@@ -49,18 +49,18 @@ public class TractionAuto extends LinearOpMode  {
         traction.move(36.0, 90.0, 1.0);
         traction.move(-36.0, 0.0, 1.0);
         traction.move(36.0, -90.0, 1.0);
-        Thread.sleep(1000);
+        sleep(1000);
 
         // run in a 3' X within the above square
         traction.move(50.91, 45.0, 1.0);
         traction.move(-36.0, 0.0, 1.0);
         traction.move(50.91, -45.0, 1.0);
         traction.move(-36.0, 0.0, 1.0);
-        Thread.sleep(1000);
+        sleep(1000);
 
         // spin (demonstrates crossing the -180 to/from 189 boundary
         traction.rotate(360.0, 1.0);
         traction.rotate(-360.0, 1.0);
-        Thread.sleep(1000);
+        sleep(1000);
     }
 }

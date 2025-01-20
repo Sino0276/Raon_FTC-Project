@@ -1,10 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
+
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 /**
  * This class interfaces to Roy and Jeff's Rover Ruckus mecanum drive base. So we know the configuration and will get
@@ -15,32 +20,32 @@ public class MecanumTraction extends TractionBase {
     protected LinearOpMode linearOpMode;
 
     // This is the physical hardware - motors and sensors - that provide the physical implementation of the traction.
-    protected BNO055IMU imu_0;    // primary IMU
-    protected BNO055IMU imu_1;    // Backup IMU
+    protected IMU imu_0;    // primary IMU
+//    protected BNO055IMU imu_1;    // Backup IMU
     protected DcMotor motor_rf;   // right front motor
     protected DcMotor motor_rr;   // right rear motor
     protected DcMotor motor_lf;   // left front motor
     protected DcMotor motor_lr;   // left rear motor
     // After calibration this term represents the bias of the mecanum drive as a result of alignment, friction, etc.
     // that results in un-intended forward-backward motion when sideways motion is requested.
-    protected static final double V_forward_V_side_bias = 0.0;
+    protected static final double V_forward_V_side_bias = MecanumTractionConfig.V_forward_V_side_bias;
     // After calibration this term represents the bias of the mecanum drive as a result of alignment, friction, etc.
     // that results in un-intended turn motion when sideways motion is requested.
-    protected static final double V_turn_V_side_bias = 0.0;
+    protected static final double V_turn_V_side_bias = MecanumTractionConfig.V_turn_V_side_bias;
 
     // The constants that regulate this program - adjust these to your physical
     // implementation of the drive.
-    protected static final double mtr_accel_min = 0.3;
-    protected static final double mtr_decel_min = 0.1;
-    protected static final double mtr_accel_tics = 600.0;
-    protected static final double mtr_decel_tics = 1200.0;
-    protected static final double mtr_accel_degs = 20.0;
-    protected static final double mtr_decel_degs = 30.0;
-    protected static final double tics_per_inch_forward = 84.0;
-    protected static final double tics_per_inch_sideways = 83.0;
+    protected static final double mtr_accel_min = MecanumTractionConfig.mtr_accel_min;
+    protected static final double mtr_decel_min = MecanumTractionConfig.mtr_decel_min;
+    protected static final double mtr_accel_tics = MecanumTractionConfig.mtr_accel_tics;
+    protected static final double mtr_decel_tics = MecanumTractionConfig.mtr_decel_tics;
+    protected static final double mtr_accel_degs = MecanumTractionConfig.mtr_accel_degs;
+    protected static final double mtr_decel_degs = MecanumTractionConfig.mtr_decel_degs;
+    protected static final double tics_per_inch_forward = MecanumTractionConfig.tics_per_inch_forward;
+    protected static final double tics_per_inch_sideways = MecanumTractionConfig.tics_per_inch_sideways;
     // A turning rate when in automotive drive mode to limit the turn rate at full
     // forward or backward speed.
-    protected static final double auto_turn_rate = 0.15;
+    protected static final double auto_turn_rate = MecanumTractionConfig.auto_turn_rate;
 
     // tracking the heading of the robot
     protected double heading;             // the current heading of the robot
@@ -90,8 +95,10 @@ public class MecanumTraction extends TractionBase {
         // discontinuity and increment a rotation counter so our heading will start
         // at 0 when the IMU is initialized, and be a continuous function from
         // -infinity to +infinity.
-        Orientation angles = imu_0.getAngularOrientation();
-        double heading_raw = angles.firstAngle;
+//        Orientation angles = imu_0.getAngularOrientation();
+        YawPitchRollAngles angles = imu_0.getRobotYawPitchRollAngles();
+//        double heading_raw = angles.firstAngle;
+        double heading_raw = angles.getYaw();
         if (heading_raw_last < -140.0 && heading_raw > 0.0) {
             heading_revs -= 1;
         } else if (heading_raw_last > 140.0 && heading_raw < 0.0) {
@@ -114,8 +121,11 @@ public class MecanumTraction extends TractionBase {
         this.linearOpMode = linearOpMode;
         HardwareMap hardware_map = linearOpMode.hardwareMap;
         // find the primary and secondary IMUs
-        imu_0 = hardware_map.get(BNO055IMU.class, "imu_0");
-        imu_1 = hardware_map.get(BNO055IMU.class, "imu_1");
+        imu_0 = hardware_map.get(IMU.class, "imu_0");
+//        imu_1 = hardware_map.get(BNO055IMU.class, "imu_1");
+
+        this.linearOpMode.telemetry.addData("check1", 1);
+        this.linearOpMode.telemetry.update();
 
         // find the motors
         motor_rf = hardware_map.get(DcMotor.class, "mtr_rf");
@@ -123,36 +133,45 @@ public class MecanumTraction extends TractionBase {
         motor_lf = hardware_map.get(DcMotor.class, "mtr_lf");
         motor_lr = hardware_map.get(DcMotor.class, "mtr_lr");
 
+
+        this.linearOpMode.telemetry.addData("check2", 1);
+        this.linearOpMode.telemetry.update();
+
         // initialize the motors
         DcMotor.RunMode run_mode = DcMotor.RunMode.RUN_USING_ENCODER;
         DcMotor.ZeroPowerBehavior at_zero_power = DcMotor.ZeroPowerBehavior.BRAKE;
-        lclMotorSetup(motor_rf, DcMotor.Direction.REVERSE, run_mode, at_zero_power);
+        lclMotorSetup(motor_rf, DcMotor.Direction.FORWARD, run_mode, at_zero_power);
         lclMotorSetup(motor_rr, DcMotor.Direction.FORWARD, run_mode, at_zero_power);
-        lclMotorSetup(motor_lf, DcMotor.Direction.FORWARD, run_mode, at_zero_power);
+        lclMotorSetup(motor_lf, DcMotor.Direction.REVERSE, run_mode, at_zero_power);
         lclMotorSetup(motor_lr, DcMotor.Direction.REVERSE, run_mode, at_zero_power);
     }
 
+//    @Override
+//    public void postStartInitialize() {
+//        // initialize the primary and secondary IMUs
+//        BNO055IMU.Parameters imu_params = new BNO055IMU.Parameters(/*new RevHubOrientationOnRobot().LogoFacingDirection.BACKWARD, */);
+//        imu_params.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+//        imu_params.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+//        imu_params.calibrationDataFile = "BNO055IMUCalibration.json";
+//        imu_params.loggingEnabled = false;
+//        imu_0.initialize(imu_params);
+////        imu_1.initialize(imu_params);
+//        while (true) {
+//            if (imu_0.isGyroCalibrated()/* && imu_1.isGyroCalibrated()*/) {
+//                break;
+//            }
+//        }
+//        // initialize the heading tracking
+//        heading_revs = 0;
+//        Orientation angles = imu_0.getAngularOrientation();
+//        heading_raw_last = angles.firstAngle;
+//        heading = -heading_raw_last;
+//
+//    }
     @Override
     public void postStartInitialize() {
-        // initialize the primary and secondary IMUs
-        BNO055IMU.Parameters imu_params = new BNO055IMU.Parameters();
-        imu_params.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        imu_params.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        imu_params.calibrationDataFile = "BNO055IMUCalibration.json";
-        imu_params.loggingEnabled = false;
-        imu_0.initialize(imu_params);
-        imu_1.initialize(imu_params);
-        while (true) {
-            if (imu_0.isGyroCalibrated() && imu_1.isGyroCalibrated()) {
-                break;
-            }
-        }
-        // initialize the heading tracking
-        heading_revs = 0;
-        Orientation angles = imu_0.getAngularOrientation();
-        heading_raw_last = angles.firstAngle;
-        heading = -heading_raw_last;
-
+        imu_0.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD, RevHubOrientationOnRobot.UsbFacingDirection.LEFT)));
+        imu_0.resetYaw();
     }
 
     @Override

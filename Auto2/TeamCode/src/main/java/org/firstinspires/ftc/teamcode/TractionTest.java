@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * your encoder tics-per-inch, acceleration and deceleration windows, etc. See the notes in README.md for
  * documentation of the control operations.
  */
-@TeleOp(name = "TractionTest", group = "")
+@TeleOp(name = "TractionTest")
 public class TractionTest extends LinearOpMode {
     private int drive_mode = 0;
     private int last_drive_mode = drive_mode;
