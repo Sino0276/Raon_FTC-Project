@@ -1,6 +1,11 @@
 package org.firstinspires.ftc.teamcode;
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.teamcode.mecanum.Utils;
+import org.firstinspires.ftc.teamcode.mecanum.traction.ITraction;
+import org.firstinspires.ftc.teamcode.mecanum.traction.MecanumPidTraction;
 
 /**
  * This is a simple test program that exercises different drive controller options that will help you manually test
@@ -10,7 +15,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  */
 @TeleOp(name = "TractionTest")
 public class TractionTest extends LinearOpMode {
-    private int drive_mode = 0;
+    private int drive_mode = 2;
     private int last_drive_mode = drive_mode;
     private String[] drive_mode_name = {"tank", "airplane right", "airplane left",
             "auto right", "auto left"};
@@ -117,7 +122,7 @@ public class TractionTest extends LinearOpMode {
         left_y = -gamepad1.left_stick_y;
         right_x = gamepad1.right_stick_x;
         right_y = -gamepad1.right_stick_y;
-        if (gamepad1.right_bumper) {
+        if (gamepad1.left_bumper) {
             left_x *= bumper_speed;
             left_y *= bumper_speed;
             right_x *= bumper_speed;

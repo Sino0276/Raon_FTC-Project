@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.mecanum.traction.ITraction;
+import org.firstinspires.ftc.teamcode.mecanum.traction.MecanumPidTraction;
+
 @Autonomous(name = "ParkingLeft", group = "test")
 public class _ParkingLeft extends LinearOpMode {
 

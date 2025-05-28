@@ -1,10 +1,8 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.mecanum.manipulator;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import org.firstinspires.ftc.teamcode.mecanum.IMecanum;
 
-public interface IManipulator {
-
-    void initialize(LinearOpMode linearOpMode);
+public interface IManipulator extends IMecanum {
 
 //    void postStartInitialize();
 

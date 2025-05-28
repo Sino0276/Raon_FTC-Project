@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.mecanum.traction;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 /**
  * This is an extension of MecanumTraction that tracks the autonomous operation heading (expected heading) and is
@@ -50,6 +50,7 @@ public class MecanumPidTraction extends MecanumTraction {
     @Override
     public void move(double inches, double degrees, double max_speed) {
         reset_drive_encoders();
+        resetExpectedHeading();////////////////////////////////////////////////////////
         // We are going to use the cos and sin of the angle as the forward and
         // sideways speed respectively. NOTE: Math methods that would be called
         // multiple times in an expanded form are called once to minimize overhead
@@ -75,6 +76,11 @@ public class MecanumPidTraction extends MecanumTraction {
                     forward_direction_mult;
             while (true) {
                 double current_forward_tics = forward_direction_mult * forward_tics();
+//                FtcDashboard dashboard = FtcDashboard.getInstance();
+//                Telemetry telemetry = dashboard.getTelemetry();
+//                telemetry.addData("incoder", current_forward_tics);
+//                telemetry.update();
+
                 if (current_forward_tics >= forward_target_tics) {
                     break;
                 }

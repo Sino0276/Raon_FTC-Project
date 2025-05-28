@@ -1,6 +1,8 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.mecanum.traction;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.firstinspires.ftc.teamcode.mecanum.IMecanum;
 
 /**
  * The interface for a traction object, which represents the traction (horizontal motion) base
@@ -13,14 +15,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  *   the beginning of the move
  * - rotate some degrees with max rotation speed
  */
-public interface ITraction {
-    /**
-     * Initialize the traction implementation, which normally means find the traction motors in the
-     * <tt>linearOpMode</tt> and initialize them for use. Setup IMUs, etc.
-     *
-     * @param linearOpMode (LinearOpMode, readonly) The liner operation mode this traction is being used in.
-     */
-    void initialize(LinearOpMode linearOpMode);
+public interface ITraction extends IMecanum {
 
     /**
      * The post-start initialization. This is here for things like IMU calibration which should be delayed until
