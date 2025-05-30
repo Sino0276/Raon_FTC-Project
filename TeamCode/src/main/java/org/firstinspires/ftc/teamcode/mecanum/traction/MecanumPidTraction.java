@@ -126,6 +126,7 @@ public class MecanumPidTraction extends MecanumTraction {
 
     @Override
     public void rotate(double degrees, double max_rotate_speed) {
+        resetExpectedHeading();////////////////////////////////////////////////////////
         // update the expected heading to reflect the rotation and then rotate to the expected heading
         expected_heading += degrees;
         super.rotate(expected_heading - heading, max_rotate_speed);

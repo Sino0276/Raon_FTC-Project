@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode.mecanum.manipulator;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-public abstract class ManipulatorBase implements IManipulator {
+import org.firstinspires.ftc.teamcode.mecanum.IMecanum;
+
+public abstract class ManipulatorBase implements IMecanum {
 
     protected void lclMotorSetup(DcMotor motor, DcMotor.Direction direction,
                                  DcMotor.RunMode run_mode, DcMotor.ZeroPowerBehavior zero_power_behavior) {
@@ -47,4 +49,7 @@ public abstract class ManipulatorBase implements IManipulator {
         }
         return mtr_tmp;
     }
+
+    protected abstract void reset_encoders();
+
 }

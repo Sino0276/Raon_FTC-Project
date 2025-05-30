@@ -2,34 +2,29 @@ package org.firstinspires.ftc.teamcode.mecanum.manipulator;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.teamcode.mecanum.traction.MecanumTractionConfig;
 
 public class ArmManipulator extends ManipulatorBase {
 
     protected LinearOpMode linearOpMode;
 
     protected DcMotor arm_angle;
-    protected DcMotor arm_length;
-    protected Servo hand;
+    private DcMotor.Direction direction;
 
-    protected int arm_angle_tics = 13420;
+    protected static double mtr_accel_min = ArmAngleManipulatorConfig.mtr_accel_min;
+    protected static double mtr_decel_min = ArmAngleManipulatorConfig.mtr_decel_min;
+    protected static double mtr_accel_tics = ArmAngleManipulatorConfig.mtr_accel_tics;
+    protected static double mtr_decel_tics = ArmAngleManipulatorConfig.mtr_decel_tics;
+    protected static double tollerance = ArmAngleManipulatorConfig.tollerance;
+    protected static double encoder_resolution = 537.7f;
 
-
-    protected void reset_arm_encoders() {
-        arm_angle.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm_length.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm_angle.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        arm_length.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    public ArmManipulator(DcMotor.Direction direction) {
+        this.direction = direction;
     }
-
-
-
-
-
-
-
-
 
     @Override
     public void initialize(LinearOpMode linearOpMode) {
@@ -38,26 +33,26 @@ public class ArmManipulator extends ManipulatorBase {
 
         // find the motors
         arm_angle = hardware_map.get(DcMotor.class, "arm_angle");
-        arm_length = hardware_map.get(DcMotor.class, "arm_length");
-        // find the servo
-        hand = hardware_map.get(Servo.class, "hand");
 
         // initialize the motors
         DcMotor.RunMode run_mode = DcMotor.RunMode.RUN_USING_ENCODER;
         DcMotor.ZeroPowerBehavior at_zero_power = DcMotor.ZeroPowerBehavior.BRAKE;
-        lclMotorSetup(arm_angle, DcMotor.Direction.FORWARD, run_mode, at_zero_power);
-        lclMotorSetup(arm_length, DcMotor.Direction.FORWARD, run_mode, at_zero_power);
-        // initialize the servo
-        lclServoSetup(hand, Servo.Direction.FORWARD);
+        lclMotorSetup(arm_angle, direction, run_mode, at_zero_power);
     }
 
     @Override
-    public void angle(double degrees, double max_speed) {
-//        power_accel_decel(arm_angle.getCurrentPosition(), )
+    protected void reset_encoders() {
+        arm_angle.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm_angle.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    @Override
-    public void length(double len, double max_speed) {
+    public void setSpeeds(double forward) {
+        // OK, so the maximum-minimum is the sum of the absolute values of forward, side, and turn
+        double scale = 1.0;
 
+        if (forward > 1.0) {
+            forward = 1;
+        }
+        arm_angle.setPower(forward);
     }
 }

@@ -34,17 +34,17 @@ public class MecanumTraction extends TractionBase {
 
     // The constants that regulate this program - adjust these to your physical
     // implementation of the drive.
-    protected static final double mtr_accel_min = MecanumTractionConfig.mtr_accel_min;
-    protected static final double mtr_decel_min = MecanumTractionConfig.mtr_decel_min;
-    protected static final double mtr_accel_tics = MecanumTractionConfig.mtr_accel_tics;
-    protected static final double mtr_decel_tics = MecanumTractionConfig.mtr_decel_tics;
-    protected static final double mtr_accel_degs = MecanumTractionConfig.mtr_accel_degs;
-    protected static final double mtr_decel_degs = MecanumTractionConfig.mtr_decel_degs;
-    protected static final double tics_per_inch_forward = MecanumTractionConfig.tics_per_inch_forward;
-    protected static final double tics_per_inch_sideways = MecanumTractionConfig.tics_per_inch_sideways;
+    protected static double mtr_accel_min = MecanumTractionConfig.mtr_accel_min;
+    protected static double mtr_decel_min = MecanumTractionConfig.mtr_decel_min;
+    protected static double mtr_accel_tics = MecanumTractionConfig.mtr_accel_tics;
+    protected static double mtr_decel_tics = MecanumTractionConfig.mtr_decel_tics;
+    protected static double mtr_accel_degs = MecanumTractionConfig.mtr_accel_degs;
+    protected static double mtr_decel_degs = MecanumTractionConfig.mtr_decel_degs;
+    protected static double tics_per_inch_forward = MecanumTractionConfig.tics_per_inch_forward;
+    protected static double tics_per_inch_sideways = MecanumTractionConfig.tics_per_inch_sideways;
     // A turning rate when in automotive drive mode to limit the turn rate at full
     // forward or backward speed.
-    protected static final double auto_turn_rate = MecanumTractionConfig.auto_turn_rate;
+    protected static double auto_turn_rate = MecanumTractionConfig.auto_turn_rate;
 
     // tracking the heading of the robot
     protected double heading;             // the current heading of the robot
