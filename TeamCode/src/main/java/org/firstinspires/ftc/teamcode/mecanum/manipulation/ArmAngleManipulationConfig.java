@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode.mecanum.manipulator;
+package org.firstinspires.ftc.teamcode.mecanum.manipulation;
 
 import com.acmerobotics.dashboard.config.Config;
 
 @Config
-public class ArmAngleManipulatorConfig {
+public class ArmAngleManipulationConfig {
 
     public static float encoder_resolution = 537.7f;
 

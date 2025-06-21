@@ -1,28 +1,24 @@
-package org.firstinspires.ftc.teamcode.mecanum.manipulator;
+package org.firstinspires.ftc.teamcode.mecanum.manipulation;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.mecanum.traction.MecanumTractionConfig;
-
-public class ArmManipulator extends ManipulatorBase {
+public class ArmManipulation extends ManipulationBase {
 
     protected LinearOpMode linearOpMode;
 
     protected DcMotor arm_angle;
     private DcMotor.Direction direction;
 
-    protected static double mtr_accel_min = ArmAngleManipulatorConfig.mtr_accel_min;
-    protected static double mtr_decel_min = ArmAngleManipulatorConfig.mtr_decel_min;
-    protected static double mtr_accel_tics = ArmAngleManipulatorConfig.mtr_accel_tics;
-    protected static double mtr_decel_tics = ArmAngleManipulatorConfig.mtr_decel_tics;
-    protected static double tollerance = ArmAngleManipulatorConfig.tollerance;
+    protected static double mtr_accel_min = ArmAngleManipulationConfig.mtr_accel_min;
+    protected static double mtr_decel_min = ArmAngleManipulationConfig.mtr_decel_min;
+    protected static double mtr_accel_tics = ArmAngleManipulationConfig.mtr_accel_tics;
+    protected static double mtr_decel_tics = ArmAngleManipulationConfig.mtr_decel_tics;
+    protected static double tollerance = ArmAngleManipulationConfig.tollerance;
     protected static double encoder_resolution = 537.7f;
 
-    public ArmManipulator(DcMotor.Direction direction) {
+    public ArmManipulation(DcMotor.Direction direction) {
         this.direction = direction;
     }
 

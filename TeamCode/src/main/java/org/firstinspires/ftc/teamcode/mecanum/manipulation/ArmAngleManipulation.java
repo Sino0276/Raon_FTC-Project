@@ -1,17 +1,17 @@
-package org.firstinspires.ftc.teamcode.mecanum.manipulator;
+package org.firstinspires.ftc.teamcode.mecanum.manipulation;
 
 import static java.lang.Math.abs;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-public class ArmAngleManipulator extends ArmManipulator {
+public class ArmAngleManipulation extends ArmManipulation {
     private double gear_ratio;
       // 모델에 따라 바꿔야 함
     private double tics_per_degree;
 
     private double kp = 0.1;
 
-    public ArmAngleManipulator(DcMotor.Direction direction, float gear_ratio) {
+    public ArmAngleManipulation(DcMotor.Direction direction, float gear_ratio) {
         super(direction);
         this.gear_ratio = gear_ratio;
 

@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.mecanum.manipulator;
 
 import org.firstinspires.ftc.teamcode.mecanum.IMecanum;
 
-public interface IManipulator extends IMecanum {
+public interface IManipulation extends IMecanum {
 
 //    void postStartInitialize();
 

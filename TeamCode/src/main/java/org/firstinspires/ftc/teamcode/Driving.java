@@ -1,10 +1,9 @@
-package org.firstinspires.ftc.teamcode.mecanum;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.teamcode.mecanum.manipulator.ArmAngleManipulator;
-import org.firstinspires.ftc.teamcode.mecanum.traction.ITraction;
+import org.firstinspires.ftc.teamcode.mecanum.manipulation.ArmAngleManipulation;
 import org.firstinspires.ftc.teamcode.mecanum.traction.MecanumPidTraction;
 
 @TeleOp(name = "Driving")
@@ -14,7 +13,7 @@ public class Driving extends LinearOpMode {
 //    private String[] drive_mode_name = {"tank", "airplane right", "airplane left", "auto right", "auto left"};
 
     private MecanumPidTraction traction = new MecanumPidTraction();      // Mecanum, with PID heading correction
-    private ArmAngleManipulator angle = new ArmAngleManipulator(DcMotorSimple.Direction.REVERSE, 1);
+    private ArmAngleManipulation angle = new ArmAngleManipulation(DcMotorSimple.Direction.REVERSE, 1);
 
     private double bumper_speed = 0.6;
     double calibration_distance = 24.0;

@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.mecanum.manipulator;
+package org.firstinspires.ftc.teamcode.mecanum.manipulation;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.mecanum.IMecanum;
 
-public abstract class ManipulatorBase implements IMecanum {
+public abstract class ManipulationBase implements IMecanum {
 
     protected void lclMotorSetup(DcMotor motor, DcMotor.Direction direction,
                                  DcMotor.RunMode run_mode, DcMotor.ZeroPowerBehavior zero_power_behavior) {
@@ -13,10 +13,6 @@ public abstract class ManipulatorBase implements IMecanum {
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setMode(run_mode);
         motor.setZeroPowerBehavior(zero_power_behavior);
-    }
-
-    protected void lclServoSetup(Servo servo, Servo.Direction direction) {
-        servo.setDirection(direction);
     }
 
     protected double power_accel_decel(double current, double target,
