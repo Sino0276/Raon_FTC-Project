@@ -4,11 +4,13 @@ import static org.firstinspires.ftc.teamcode.configs.ShooterConfig.TPS;
 import static org.firstinspires.ftc.teamcode.configs.ShooterConfig.TURNING_PID;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 
 @TeleOp(name = "ShooterTest", group = "java")
