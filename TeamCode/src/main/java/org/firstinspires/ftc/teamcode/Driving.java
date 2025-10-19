@@ -1,54 +1,64 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.configs.ShooterConfig.TPS;
-import static org.firstinspires.ftc.teamcode.configs.ShooterConfig.TURNING_PID;
+import static org.firstinspires.ftc.teamcode.configs.DriveConfig.*;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.teamcode.configs.DriveConfig;
+
 @TeleOp(name = "mtrTest", group = "java")
-public class driving extends OpMode {
+public class Driving extends OpMode {
 
     FtcDashboard dashboard = FtcDashboard.getInstance();
     TelemetryPacket packet = new TelemetryPacket();
-    DcMotorEx mtr;
+    DcMotorEx mtr = hardwareMap.get(DcMotorEx.class, "mtr");
 
     @Override
     public void init() {
-        mtr = hardwareMap.get(DcMotorEx.class, "mtr");
+        mtr.setVelocityPIDFCoefficients(DRIVE_PID.p, DRIVE_PID.i, DRIVE_PID.d, DRIVE_PID.f);
+        mtr.setTargetPositionTolerance(TOLERANCE);  // 허용오차 설정
     }
 
     @Override
     public void loop() {
         if (gamepad1.a) {
-            mtr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            /*
-                537.7 tick = 360 degree
-                WheelRadius = 1.9
-                Tick Per Inch = tick / (2 * WheelRadius * PI)
-                 = 537.7 / (2 * 1.9 * 3.14)
-                 = 45
-
-             */
-            mtr.setTargetPosition(45);
-
-            mtr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            mtr.setVelocity(TPS);
+            move();
         }
-        else if (gamepad1.b) {
-            mtr.setVelocityPIDFCoefficients(TURNING_PID.p, TURNING_PID.i, TURNING_PID.d, TURNING_PID.f);
+        else if (gamepad1.y) {
+            mtr.setVelocityPIDFCoefficients(DRIVE_PID.p, DRIVE_PID.i, DRIVE_PID.d, DRIVE_PID.f);
         }
 
+        showData();
+    }
+
+    /**
+     * <p> 537.7 tick = 360 degree
+     * <p> WheelRadius = 1.9
+     * <p> Tick Per Inch = tick / (2 * WheelRadius * PI)
+     * <p> = 537.7 / (2 * 1.9 * 3.14)
+     * <p> = 45.0....
+     */
+    private void move() {
+        mtr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        mtr.setTargetPosition(45);
+
+        mtr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        // Velocity의 PIDF계수 사용X -> TargetPos의 P계수만 사용. 즉 TargetPos랑 Velocity를 같이 사용하면, Velocity는 최대속도 제한용 인거임
+        // 근데 짜피 PinPoint사용하면 바퀴 굴릴땐 targetPosition못씀. 로봇팔에선 쓸 수 있겠네
+        mtr.setVelocity(DriveConfig.TPS);
+    }
+
+    private void showData() {
         packet.put("CurrentPos", mtr.getCurrentPosition());
         packet.put("TargetPos", mtr.getTargetPosition());
-
-        packet.put("TARGET", TPS);
-        packet.put("leftVelocity", mtr.getVelocity());
+        packet.put("TPS", TPS);
+        packet.put("Velocity", mtr.getVelocity());
         dashboard.sendTelemetryPacket(packet);
     }
 }

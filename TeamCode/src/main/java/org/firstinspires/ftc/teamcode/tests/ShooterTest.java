@@ -1,16 +1,14 @@
 package org.firstinspires.ftc.teamcode.tests;
 
 import static org.firstinspires.ftc.teamcode.configs.ShooterConfig.TPS;
-import static org.firstinspires.ftc.teamcode.configs.ShooterConfig.TURNING_PID;
+import static org.firstinspires.ftc.teamcode.configs.ShooterConfig.SHOOTER_PID;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 
 @TeleOp(name = "ShooterTest", group = "java")
@@ -38,8 +36,8 @@ public class ShooterTest extends LinearOpMode {
             flyWheel2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             flyWheel1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             flyWheel2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            flyWheel1.setVelocityPIDFCoefficients(TURNING_PID.p, TURNING_PID.i, TURNING_PID.d, TURNING_PID.f);
-            flyWheel2.setVelocityPIDFCoefficients(TURNING_PID.p, TURNING_PID.i, TURNING_PID.d, TURNING_PID.f);
+            flyWheel1.setVelocityPIDFCoefficients(SHOOTER_PID.p, SHOOTER_PID.i, SHOOTER_PID.d, SHOOTER_PID.f);
+            flyWheel2.setVelocityPIDFCoefficients(SHOOTER_PID.p, SHOOTER_PID.i, SHOOTER_PID.d, SHOOTER_PID.f);
 
 //            servo = hardwareMap.get(Servo.class, "servo");
             crServo = hardwareMap.get(CRServo.class, "servo");
@@ -62,8 +60,8 @@ public class ShooterTest extends LinearOpMode {
                     flyWheel2.setVelocity(TPS);
                 } else if (gamepad1.y) {
                     dashboard.updateConfig();
-                    flyWheel1.setVelocityPIDFCoefficients(TURNING_PID.p, TURNING_PID.i, TURNING_PID.d, TURNING_PID.f);
-                    flyWheel2.setVelocityPIDFCoefficients(TURNING_PID.p, TURNING_PID.i, TURNING_PID.d, TURNING_PID.f);
+                    flyWheel1.setVelocityPIDFCoefficients(SHOOTER_PID.p, SHOOTER_PID.i, SHOOTER_PID.d, SHOOTER_PID.f);
+                    flyWheel2.setVelocityPIDFCoefficients(SHOOTER_PID.p, SHOOTER_PID.i, SHOOTER_PID.d, SHOOTER_PID.f);
                 }
 
 
