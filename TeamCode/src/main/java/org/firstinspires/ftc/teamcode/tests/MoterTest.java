@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.tests;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 @Config
 @TeleOp(name = "mtrTest", group = "java")
-public class Driving extends OpMode {
+public class MoterTest extends OpMode {
     public static PIDFCoefficients DRIVE_PID = new PIDFCoefficients(5, 2, 1, 11);
     /// max TPS == 2800
     public static int TPS = 2800;
@@ -27,7 +27,7 @@ public class Driving extends OpMode {
     @Override
     public void init() {
         mtr = hardwareMap.get(DcMotorEx.class, "mtr");
-        mtrInit();
+        mtrLoad();
     }
 
     @Override
@@ -36,13 +36,13 @@ public class Driving extends OpMode {
             move();
         }
         else if (gamepad1.y) {
-            mtrInit();
+            mtrLoad();
         }
 
         showData();
     }
 
-    private void mtrInit() {
+    private void mtrLoad() {
         mtr.setVelocityPIDFCoefficients(DRIVE_PID.p, DRIVE_PID.i, DRIVE_PID.d, DRIVE_PID.f);
         mtr.setTargetPositionTolerance(TOLERANCE);  // 허용오차 설정
     }

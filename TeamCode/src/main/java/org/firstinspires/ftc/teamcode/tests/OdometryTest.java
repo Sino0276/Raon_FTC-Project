@@ -11,16 +11,17 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 @TeleOp(name = "OdometryTest", group = "java")
 public class OdometryTest extends LinearOpMode {
-
     private GoBildaPinpointDriver odo;
 
+
+    /// Tick Per Inch = 505.33
     @Override
     public void runOpMode() {
 
         odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
         odo.initialize();
-        odo.setOffsets(104.6, -72, DistanceUnit.MM);  // 임시설정 - 수정할것
-        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.REVERSED);
+        odo.setOffsets(3, -72, DistanceUnit.MM);  // 임시설정 - 수정할것
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 
         waitForStart();
@@ -29,16 +30,25 @@ public class OdometryTest extends LinearOpMode {
             TelemetryPacket packet = new TelemetryPacket();
 
             odo.resetPosAndIMU();
+            odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
 
             while (opModeIsActive()) {
+
+                if (gamepad1.a) {
+                    odo.resetPosAndIMU();
+                    odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
+                }
+
                 odo.update();
                 packet.put("Encoder_X", odo.getEncoderX());
                 packet.put("Encoder_Y", odo.getEncoderY());
-                packet.put("Pos_X", odo.getPosX(DistanceUnit.MM));
-                packet.put("Pos_Y", odo.getPosY(DistanceUnit.MM));
-                packet.put("Velocity_X", odo.getVelX(DistanceUnit.MM));
-                packet.put("Velocity_Y", odo.getVelY(DistanceUnit.MM));
+                packet.put("Pos_X", odo.getPosX(DistanceUnit.INCH));
+                packet.put("Pos_Y", odo.getPosY(DistanceUnit.INCH));
+//                packet.put("Velocity_X", odo.getVelX(DistanceUnit.INCH));
+//                packet.put("Velocity_Y", odo.getVelY(DistanceUnit.INCH));
                 packet.put("Degree", odo.getHeading(AngleUnit.DEGREES));
+                packet.put("Pos", odo.getPosition());
+                odo.getPosition().getX(DistanceUnit.INCH);
 
                 dashboard.sendTelemetryPacket(packet);
             }
