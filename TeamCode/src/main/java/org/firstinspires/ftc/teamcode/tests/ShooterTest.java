@@ -1,23 +1,25 @@
 package org.firstinspires.ftc.teamcode.tests;
 
-import static org.firstinspires.ftc.teamcode.configs.ShooterConfig.TPS;
-import static org.firstinspires.ftc.teamcode.configs.ShooterConfig.SHOOTER_PID;
-
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 
+@Config
 @TeleOp(name = "ShooterTest", group = "java")
 public class ShooterTest extends LinearOpMode {
+
+    public static PIDFCoefficients SHOOTER_PID = new PIDFCoefficients(2, 0.3, 0.001, 11);
+
+    public static int TPS = 2800;
     private enum State {
         ACTIVE,     // 회전 중
         UNACTIVE    // !회전 중
     }
-
     private State currentState = State.UNACTIVE;
 
     private FtcDashboard dashboard = FtcDashboard.getInstance();
@@ -28,8 +30,8 @@ public class ShooterTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        flyWheel1 = hardwareMap.get(DcMotorEx.class, "r");
-        flyWheel2 = hardwareMap.get(DcMotorEx.class, "l");
+        flyWheel1 = hardwareMap.get(DcMotorEx.class, "shooter1");
+        flyWheel2 = hardwareMap.get(DcMotorEx.class, "shooter2");
 
         waitForStart();
         if (opModeIsActive()) {
@@ -37,11 +39,12 @@ public class ShooterTest extends LinearOpMode {
             mtrLoad();
             while (opModeIsActive()) {
 
-                if (gamepad1.x) {
+                if (gamepad1.xWasPressed()) {
                     switch (currentState) {
                         case ACTIVE:
                             currentState = State.UNACTIVE;
-                            mtrSetVelocity(0);
+                            mtrSetPower(0);
+
                             break;
 
                         case UNACTIVE:
@@ -62,6 +65,10 @@ public class ShooterTest extends LinearOpMode {
         flyWheel2.setVelocity(TPS);
     }
 
+    private void mtrSetPower(double power) {
+        flyWheel1.setPower(power);
+        flyWheel2.setPower(power);
+    }
 
     private void mtrInit() {
         flyWheel1.setDirection(DcMotorEx.Direction.FORWARD);
@@ -70,6 +77,8 @@ public class ShooterTest extends LinearOpMode {
         flyWheel2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         flyWheel1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         flyWheel2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flyWheel1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        flyWheel2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
     private void mtrLoad() {
