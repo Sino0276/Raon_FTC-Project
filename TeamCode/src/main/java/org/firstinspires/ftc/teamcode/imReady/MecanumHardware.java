@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class MecanumHardware extends DcMotorHardware {
+public abstract class MecanumHardware extends DcMotorBase {
     protected DcMotorEx mtr_rr, mtr_rf, mtr_lr, mtr_lf;
     protected List<DcMotorEx> motors;
 

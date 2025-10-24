@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.imReady;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-public abstract class DcMotorHardware {
+public abstract class DcMotorBase {
 
     public void motorSetup(DcMotorEx motor,
                            DcMotorEx.Direction direction,
