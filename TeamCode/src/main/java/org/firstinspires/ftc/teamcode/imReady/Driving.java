@@ -10,6 +10,7 @@ public class Driving extends OpMode {
 
     private MecanumBase drive;
     private ShooterBase shooter;
+    private PusherBase pusher;
     private FtcDashboard dashboard = FtcDashboard.getInstance();
     private TelemetryPacket packet = new TelemetryPacket();
     private double forward, sideways, rotate;
@@ -18,6 +19,7 @@ public class Driving extends OpMode {
     public void init() {
         drive = new MecanumBase(hardwareMap);
         shooter = new ShooterBase(hardwareMap);
+        pusher = new PusherBase(hardwareMap);
     }
 
     @Override
@@ -59,6 +61,20 @@ public class Driving extends OpMode {
         }
         else if (gamepad2.dpadUpWasPressed()) { shooter.addTPS(100);}
         else if (gamepad2.dpadDownWasPressed()) { shooter.addTPS(-100);}
+
+        else if (gamepad2.bWasPressed()) {
+            switch (pusher.getState()) {
+                case ACTIVE:
+                    pusher.setState(PusherBase.State.UNACTIVE);
+                    pusher.moveMaxPosition();     // 여기
+                    break;
+
+                case UNACTIVE:
+                    pusher.setState(PusherBase.State.ACTIVE);
+                    pusher.moveMinPosition();        // 여기
+                    break;
+            }
+        }
 
 
         showData();

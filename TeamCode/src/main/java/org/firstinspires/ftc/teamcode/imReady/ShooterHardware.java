@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public abstract class ShooterHardware {
-    protected DcMotorEx shooter1, shooter2;
-    protected List<DcMotorEx> shooters;
+    public DcMotorEx shooter1, shooter2;
+    public List<DcMotorEx> shooters;
 
     public ShooterHardware(HardwareMap hardwareMap) {
         shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
