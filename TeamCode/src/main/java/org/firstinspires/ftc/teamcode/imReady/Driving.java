@@ -5,88 +5,87 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+
 @TeleOp(name = "Driving", group = "Ready")
 public class Driving extends OpMode {
 
     private MecanumBase drive;
     private ShooterBase shooter;
-    private PusherBase pusher;
+//    private SampleMecanumDrive driveTrain;
     private FtcDashboard dashboard = FtcDashboard.getInstance();
     private TelemetryPacket packet = new TelemetryPacket();
-    private double forward, sideways, rotate;
 
     @Override
     public void init() {
         drive = new MecanumBase(hardwareMap);
         shooter = new ShooterBase(hardwareMap);
-        pusher = new PusherBase(hardwareMap);
+//        driveTrain = new SampleMecanumDrive(hardwareMap);
     }
 
     @Override
     public void loop() {
-        if (gamepad1.aWasPressed()) { drive.switchDriveMode(); }
-        else if (gamepad1.dpadUpWasPressed()) { drive.addTPS(700);}
-        else if (gamepad1.dpadDownWasPressed()) { drive.addTPS(-700);}
-
-        switch (drive.getDriveMode()) {
-            case FOURFINGER:
-                forward = gamepad1.left_stick_y;
-                sideways = gamepad1.right_stick_x;
-                rotate = gamepad1.left_trigger - gamepad1.right_trigger;
-                break;
-
-            case TWOFINGER:
-                forward = gamepad1.left_stick_y;
-                sideways = gamepad1.left_stick_x;
-                rotate = -gamepad1.right_stick_x;
-                break;
-        }
-        drive.setSpeed(forward, sideways, rotate);
-
-
+        drive();
         // gamepad2 (Shooter) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        if (gamepad2.aWasPressed()) {
-//            shooter.switchState();
-            switch (shooter.getState()) {
-                case ACTIVE:
-                    shooter.setState(ShooterBase.State.UNACTIVE);
-                    shooter.setPower(0);
-                    break;
-
-                case UNACTIVE:
-                    shooter.setState(ShooterBase.State.ACTIVE);
-                    shooter.setVelocity(shooter.TPS);
-                    break;
-            }
-        }
-        else if (gamepad2.dpadUpWasPressed()) { shooter.addTPS(100);}
-        else if (gamepad2.dpadDownWasPressed()) { shooter.addTPS(-100);}
-
-        else if (gamepad2.bWasPressed()) {
-            switch (pusher.getState()) {
-                case ACTIVE:
-                    pusher.setState(PusherBase.State.UNACTIVE);
-                    pusher.moveMaxPosition();     // 여기
-                    break;
-
-                case UNACTIVE:
-                    pusher.setState(PusherBase.State.ACTIVE);
-                    pusher.moveMinPosition();        // 여기
-                    break;
-            }
-        }
-
+        shooter();
 
         showData();
     }
 
-        private void showData() {
-        packet.put("DriveMode", drive.getDriveMode());
+    private void drive()
+    {
+        drive.getCurrentYaw();
+        if (gamepad1.dpad_up) {
+            drive.targetYaw = drive.postYaw;
+            drive.rotate(0.7);
+        } else if (gamepad1.dpad_left) {
+            drive.targetYaw = drive.postYaw + 90;
+            drive.rotate(0.7);
+        } else if (gamepad1.dpad_down) {
+            drive.targetYaw = drive.postYaw + 180;
+            drive.rotate(0.7);
+        } else if (gamepad1.dpad_right) {
+            drive.targetYaw = drive.postYaw + 270;
+            drive.rotate(0.7);
+        } else {
+
+            double forward = gamepad1.left_stick_y;
+            double sideways = gamepad1.left_stick_x;
+            double rotate = -gamepad1.right_stick_x;
+
+            drive.setSpeed(forward, sideways, rotate);
+        }
+    }
+
+    private void shooter() {
+        if (gamepad2.aWasPressed()) {
+
+            shooter.isShooterSpin = !shooter.isShooterSpin;
+            if (shooter.isShooterSpin) {
+                shooter.setVelocity(shooter.TPS);
+            } else {
+                shooter.setPower(0);
+            }
+        }
+        // 슈터 속도 조절
+        else if (gamepad2.dpadUpWasPressed()) { shooter.addTPS(100);}
+        else if (gamepad2.dpadDownWasPressed()) { shooter.addTPS(-100);}
+
+        // 서보 회전
+        if (gamepad2.bWasPressed()) {
+
+            shooter.isServoSpin = !shooter.isServoSpin;
+            if (shooter.isServoSpin) {
+                shooter.servoSpin(1);        // 여기
+            } else {
+                shooter.servoSpin(0);     // 여기
+            }
+        }
+    }
+
+    private void showData() {
         packet.put("TPS(Shooter)", shooter.TPS);
         packet.put("TPS(Drive)", drive.TPS);
-        packet.put("forward", forward);
-        packet.put("sideways", sideways);
-        packet.put("rotate", rotate);
         dashboard.sendTelemetryPacket(packet);
     }
 }

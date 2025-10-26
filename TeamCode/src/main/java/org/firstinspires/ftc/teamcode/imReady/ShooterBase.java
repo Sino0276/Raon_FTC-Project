@@ -8,12 +8,11 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 public class ShooterBase extends ShooterHardware {
     public static PIDFCoefficients SHOOTER_PID = new PIDFCoefficients(2, 0.3, 0.001, 11);
     public static int TPS = 2800;
+//    public static double SERVO_MAX = 1;
+//    public static double SERVO_MIN = 0;
 
-    public enum State {
-        ACTIVE,     // 회전 중
-        UNACTIVE    // !회전 중
-    }
-    private State currentState = State.UNACTIVE;
+    public boolean  isShooterSpin = false,
+                    isServoSpin = false;
 
     public ShooterBase(HardwareMap hardwareMap) {
         super(hardwareMap);
@@ -34,21 +33,11 @@ public class ShooterBase extends ShooterHardware {
         else if (TPS < 0) { ShooterBase.TPS = 0; }
         else { ShooterBase.TPS = TPS; }
     }
-
     public void addTPS(int amount) { setTPS(TPS + amount); }
 
-    public State getState() { return currentState; }
-    public void setState(State state) { currentState = state; }
-    public State switchState() {
-        switch (currentState) {
-            case ACTIVE:
-                setState(ShooterBase.State.UNACTIVE);
-                break;
+    // servo
 
-            case UNACTIVE:
-                setState(ShooterBase.State.ACTIVE);
-                break;
-        }
-        return currentState;
+    public void servoSpin(double power) {
+        servo.setPower(power);
     }
 }

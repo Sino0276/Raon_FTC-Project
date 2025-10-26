@@ -20,7 +20,7 @@ public class OdometryTest extends LinearOpMode {
 
         odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
         odo.initialize();
-        odo.setOffsets(3, -72, DistanceUnit.MM);  // 임시설정 - 수정할것
+        odo.setOffsets(3, -72, DistanceUnit.MM);
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 
