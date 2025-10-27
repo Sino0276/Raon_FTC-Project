@@ -1,28 +1,24 @@
 package org.firstinspires.ftc.teamcode.imReady;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-
-import java.util.List;
 
 @Config
 public class MecanumBase extends MecanumHardware {
     public static double V_forward_V_side_bias = 0.001;
     public static double V_turn_V_side_bias = 0.001;
-    public static int TPS = 2800;
-    public static double kp = 0.002;
+    public static int TPS = 2000;
+    public static double kp = 0.02;
 
 
     public double currentYaw, targetYaw, postYaw;
 
     public MecanumBase(HardwareMap hardwareMap) {
         super(hardwareMap);
-        imu.resetYaw();
-        currentYaw = targetYaw = postYaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        updatePinpoint();
+        currentYaw = targetYaw = postYaw = pinpoint.getHeading(AngleUnit.DEGREES);
     }
 
     public void setVelocity(double power_rr, double power_rf, double power_lr, double power_lf) {
@@ -51,7 +47,7 @@ public class MecanumBase extends MecanumHardware {
             }
             rotate = kp * error;
         } else {
-            targetYaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+            currentYaw = targetYaw = getCurrentYaw();
         }
 
         // Compute the power to each of the motors
@@ -79,7 +75,7 @@ public class MecanumBase extends MecanumHardware {
 //
 //    }
 
-    public void rotate(double power) {
+    public void rotate() {
         double error = targetYaw - currentYaw;
         if (error > 180) {
             error -= 360;
@@ -88,10 +84,10 @@ public class MecanumBase extends MecanumHardware {
         }
         double rotate = kp * error;
 
-        double power_rf = power * -rotate;
-        double power_rr = power * -rotate;
-        double power_lf = power * rotate;
-        double power_lr = power * rotate;
+        double power_rf = -rotate;
+        double power_rr = -rotate;
+        double power_lf = rotate;
+        double power_lr = rotate;
 
         setVelocity(power_rf, power_rr, power_lf, power_lr);
     }
@@ -104,7 +100,11 @@ public class MecanumBase extends MecanumHardware {
     public void addTPS(int amount) { setTPS(TPS + amount); }
 
     public double getCurrentYaw() {
-        currentYaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        currentYaw = pinpoint.getHeading(AngleUnit.DEGREES);
         return currentYaw;
+    }
+
+    public void updatePinpoint() {
+        pinpoint.update();
     }
 }

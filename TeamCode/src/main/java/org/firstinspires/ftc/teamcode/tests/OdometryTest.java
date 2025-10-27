@@ -18,7 +18,7 @@ public class OdometryTest extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
+        odo = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         odo.initialize();
         odo.setOffsets(3, -72, DistanceUnit.MM);
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
@@ -47,6 +47,7 @@ public class OdometryTest extends LinearOpMode {
 //                packet.put("Velocity_X", odo.getVelX(DistanceUnit.INCH));
 //                packet.put("Velocity_Y", odo.getVelY(DistanceUnit.INCH));
                 packet.put("Degree", odo.getHeading(AngleUnit.DEGREES));
+                packet.put("Degree", odo.getPosition().getHeading(AngleUnit.DEGREES));
                 packet.put("Pos", odo.getPosition());
                 odo.getPosition().getX(DistanceUnit.INCH);
 

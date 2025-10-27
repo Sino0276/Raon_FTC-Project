@@ -5,6 +5,8 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 @TeleOp(name = "Driving", group = "Ready")
@@ -21,6 +23,9 @@ public class Driving extends OpMode {
         drive = new MecanumBase(hardwareMap);
         shooter = new ShooterBase(hardwareMap);
 //        driveTrain = new SampleMecanumDrive(hardwareMap);
+
+        dashboard.sendTelemetryPacket(packet);
+
     }
 
     @Override
@@ -34,19 +39,21 @@ public class Driving extends OpMode {
 
     private void drive()
     {
+        drive.updatePinpoint();
         drive.getCurrentYaw();
+
         if (gamepad1.dpad_up) {
             drive.targetYaw = drive.postYaw;
-            drive.rotate(0.7);
+//            drive.rotate();
         } else if (gamepad1.dpad_left) {
             drive.targetYaw = drive.postYaw + 90;
-            drive.rotate(0.7);
+//            drive.rotate();
         } else if (gamepad1.dpad_down) {
             drive.targetYaw = drive.postYaw + 180;
-            drive.rotate(0.7);
+//            drive.rotate();
         } else if (gamepad1.dpad_right) {
             drive.targetYaw = drive.postYaw + 270;
-            drive.rotate(0.7);
+//            drive.rotate();
         } else {
 
             double forward = gamepad1.left_stick_y;
@@ -84,8 +91,20 @@ public class Driving extends OpMode {
     }
 
     private void showData() {
-        packet.put("TPS(Shooter)", shooter.TPS);
-        packet.put("TPS(Drive)", drive.TPS);
+        packet.put("Encoder_X", drive.pinpoint.getEncoderX());
+        packet.put("Encoder_Y", drive.pinpoint.getEncoderY());
+        packet.put("Pos_X", drive.pinpoint.getPosX(DistanceUnit.INCH));
+        packet.put("Pos_Y", drive.pinpoint.getPosY(DistanceUnit.INCH));
+//                packet.put("Velocity_X", odo.getVelX(DistanceUnit.INCH));
+//                packet.put("Velocity_Y", odo.getVelY(DistanceUnit.INCH));
+        packet.put("getHeading", drive.pinpoint.getHeading(AngleUnit.DEGREES));
+        packet.put("pos.getHeading", drive.pinpoint.getPosition().getHeading(AngleUnit.DEGREES));
+        packet.put("Pos", drive.pinpoint.getPosition());
+
+        packet.put("targetYaw", drive.targetYaw);
+        packet.put("currentYaw", drive.currentYaw);
+        packet.put("postYaw", drive.postYaw);
+
         dashboard.sendTelemetryPacket(packet);
     }
 }
