@@ -7,14 +7,12 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 @TeleOp(name = "Driving", group = "Ready")
 public class Driving extends OpMode {
 
     private MecanumBase drive;
     private ShooterBase shooter;
-//    private SampleMecanumDrive driveTrain;
     private FtcDashboard dashboard = FtcDashboard.getInstance();
     private TelemetryPacket packet = new TelemetryPacket();
 

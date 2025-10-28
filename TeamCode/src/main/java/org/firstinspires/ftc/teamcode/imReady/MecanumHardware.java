@@ -14,9 +14,9 @@ public abstract class MecanumHardware {
     protected GoBildaPinpointDriver pinpoint;
 
     public MecanumHardware(HardwareMap hardwareMap) {
-        mtr_rr = hardwareMap.get(DcMotorEx.class, "rightRear");
+        mtr_rr = hardwareMap.get(DcMotorEx.class, "rightBack");
         mtr_rf = hardwareMap.get(DcMotorEx.class, "rightFront");
-        mtr_lr = hardwareMap.get(DcMotorEx.class, "leftRear");
+        mtr_lr = hardwareMap.get(DcMotorEx.class, "leftBack");
         mtr_lf = hardwareMap.get(DcMotorEx.class, "leftFront");
 
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
