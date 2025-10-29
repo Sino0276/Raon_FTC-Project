@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 @Config
 public class ShooterBase extends ShooterHardware {
     public static PIDFCoefficients SHOOTER_PID = new PIDFCoefficients(2, 0.3, 0.001, 11);
-    public static int TPS = 2800;
+    public static int TPS = 1000;
 //    public static double SERVO_MAX = 1;
 //    public static double SERVO_MIN = 0;
 

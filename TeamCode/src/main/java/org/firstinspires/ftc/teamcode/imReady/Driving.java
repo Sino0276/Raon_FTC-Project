@@ -73,8 +73,10 @@ public class Driving extends OpMode {
             }
         }
         // 슈터 속도 조절
-        else if (gamepad2.dpadUpWasPressed()) { shooter.addTPS(100);}
-        else if (gamepad2.dpadDownWasPressed()) { shooter.addTPS(-100);}
+        else if (gamepad2.dpadUpWasPressed()) { shooter.addTPS(10);}
+        else if (gamepad2.dpadDownWasPressed()) { shooter.addTPS(-10);}
+        else if (gamepad2.dpadLeftWasPressed()) { shooter.addTPS(100);}
+        else if (gamepad2.dpadRightWasPressed()) { shooter.addTPS(-100);}
 
         // 서보 회전
         if (gamepad2.bWasPressed()) {
@@ -102,6 +104,9 @@ public class Driving extends OpMode {
         packet.put("targetYaw", drive.targetYaw);
         packet.put("currentYaw", drive.currentYaw);
         packet.put("postYaw", drive.postYaw);
+
+        telemetry.addData("Shooter TPS", shooter.TPS);
+        telemetry.update();
 
         dashboard.sendTelemetryPacket(packet);
     }
