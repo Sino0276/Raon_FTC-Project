@@ -67,16 +67,16 @@ public class Driving extends OpMode {
 
             shooter.isShooterSpin = !shooter.isShooterSpin;
             if (shooter.isShooterSpin) {
-                shooter.setVelocity(shooter.TPS);
+                shooter.setVelocity(shooter.LEFT_TPS, shooter.RIGHT_TPS);
             } else {
-                shooter.setPower(0);
+                shooter.setPower(0, 0);
             }
         }
         // 슈터 속도 조절
-        else if (gamepad2.dpadUpWasPressed()) { shooter.addTPS(10);}
-        else if (gamepad2.dpadDownWasPressed()) { shooter.addTPS(-10);}
-        else if (gamepad2.dpadLeftWasPressed()) { shooter.addTPS(100);}
-        else if (gamepad2.dpadRightWasPressed()) { shooter.addTPS(-100);}
+        else if (gamepad2.dpadUpWasPressed())   { shooter.addTPS(100);}
+        else if (gamepad2.dpadDownWasPressed()) { shooter.addTPS(-100);}
+        else if (gamepad2.dpadLeftWasPressed()) { shooter.addLeftTPS(100);}
+        else if (gamepad2.dpadRightWasPressed()){ shooter.addRightTPS(100);}
 
         // 서보 회전
         if (gamepad2.bWasPressed()) {
@@ -105,7 +105,8 @@ public class Driving extends OpMode {
         packet.put("currentYaw", drive.currentYaw);
         packet.put("postYaw", drive.postYaw);
 
-        telemetry.addData("Shooter TPS", shooter.TPS);
+        telemetry.addData("Shooter Left TPS", shooter.LEFT_TPS);
+        telemetry.addData("Shooter RIGHT TPS", shooter.RIGHT_TPS);
         telemetry.update();
 
         dashboard.sendTelemetryPacket(packet);

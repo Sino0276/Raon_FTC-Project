@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.*;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.tuning.TuningOpModes;
 
-@Autonomous(name = "AutoTest")
+@Autonomous(name = "AutoTest1")
 public class AutoTest1 extends LinearOpMode {
     @Override
     public void runOpMode() {
