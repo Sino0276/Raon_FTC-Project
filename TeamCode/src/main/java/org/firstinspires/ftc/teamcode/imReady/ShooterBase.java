@@ -9,7 +9,7 @@ public class ShooterBase extends ShooterHardware {
     public static PIDFCoefficients SHOOTER_PID = new PIDFCoefficients(2, 0.3, 0.001, 11);
     public static int LEFT_TPS = 1000;
     public static int RIGHT_TPS = 1000;
-    public static double SERVO_MAX = 1;
+    public static double SERVO_MAX = 0.8;
     public static double SERVO_MIN = 0;
 
     public boolean  isShooterSpin = false,
@@ -61,7 +61,6 @@ public class ShooterBase extends ShooterHardware {
     // servo
 
     public void servoSpin(double power) {
-//        servo.setPower(power);
-        servo.setPosition(power);
+        servo.setPower(power);
     }
 }

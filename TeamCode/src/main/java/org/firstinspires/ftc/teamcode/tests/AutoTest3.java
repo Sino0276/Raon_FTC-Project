@@ -169,6 +169,7 @@ public class AutoTest3 extends LinearOpMode {
                 .waitSeconds(2)
                 .setTangent(Math.toRadians(90))
                 .lineToY(48)
+                .afterDisp(1, shoot.unshooting())  /// ////////////////// 이거 테스트
                 .setTangent(Math.toRadians(0))
                 .lineToX(32)
                 .strafeTo(new Vector2d(44.5, 30))

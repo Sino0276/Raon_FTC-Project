@@ -63,7 +63,7 @@ public class Driving extends OpMode {
     }
 
     private void shooter() {
-        if (gamepad2.aWasPressed()) {
+        if (gamepad2.xWasPressed()) {
 
             shooter.isShooterSpin = !shooter.isShooterSpin;
             if (shooter.isShooterSpin) {
@@ -79,17 +79,16 @@ public class Driving extends OpMode {
         else if (gamepad2.dpadRightWasPressed()){ shooter.addRightTPS(100);}
 
         // 서보 회전
-        if (gamepad2.bWasPressed()) {
+        if (gamepad2.yWasPressed()) {
 
             shooter.isServoSpin = !shooter.isServoSpin;
             if (shooter.isServoSpin) {
-                shooter.servoSpin(1);        // 여기
+                shooter.servoSpin(shooter.SERVO_MAX);        // 여기
             } else {
-                shooter.servoSpin(0);     // 여기
+                shooter.servoSpin(shooter.SERVO_MIN);     // 여기
             }
         }
     }
-
     private void showData() {
         packet.put("Encoder_X", drive.pinpoint.getEncoderX());
         packet.put("Encoder_Y", drive.pinpoint.getEncoderY());

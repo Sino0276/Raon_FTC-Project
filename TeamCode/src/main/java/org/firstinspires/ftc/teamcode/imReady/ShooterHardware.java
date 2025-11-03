@@ -9,14 +9,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public abstract class ShooterHardware {
     protected DcMotorEx shooterLeft, shooterRight;
-    protected Servo servo;
+    protected CRServo servo;
 
     public ShooterHardware(HardwareMap hardwareMap) {
         shooterLeft = hardwareMap.get(DcMotorEx.class, "shooterLeft");
         shooterRight = hardwareMap.get(DcMotorEx.class, "shooterRight");
 
-        servo = hardwareMap.get(Servo.class, "servo");
-//        servo.setDirection(CRServo.Direction.FORWARD);
+        servo = hardwareMap.get(CRServo.class, "servo");
+        servo.setDirection(CRServo.Direction.REVERSE);
 
         DcMotor.RunMode runMode = DcMotor.RunMode.RUN_USING_ENCODER;
         DcMotor.ZeroPowerBehavior zeroPowerBehavior = DcMotor.ZeroPowerBehavior.FLOAT;
