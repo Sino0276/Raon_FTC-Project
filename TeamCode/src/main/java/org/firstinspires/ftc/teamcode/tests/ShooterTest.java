@@ -13,9 +13,9 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 @TeleOp(name = "ShooterTest", group = "java")
 public class ShooterTest extends LinearOpMode {
 
-    public static PIDFCoefficients SHOOTER_PID = new PIDFCoefficients(2, 0.3, 0.001, 11);
+    public static PIDFCoefficients SHOOTER_PID = new PIDFCoefficients(100, 0.3, 0.5, 11);
 
-    public static int TPS = 2800;
+    public static int TPS = 1000;
     private enum State {
         ACTIVE,     // 회전 중
         UNACTIVE    // !회전 중
@@ -30,8 +30,8 @@ public class ShooterTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        flyWheel1 = hardwareMap.get(DcMotorEx.class, "shooter1");
-        flyWheel2 = hardwareMap.get(DcMotorEx.class, "shooter2");
+        flyWheel2 = hardwareMap.get(DcMotorEx.class, "shooterLeft");
+        flyWheel1 = hardwareMap.get(DcMotorEx.class, "shooterRight");
 
         waitForStart();
         if (opModeIsActive()) {

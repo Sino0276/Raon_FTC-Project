@@ -73,10 +73,10 @@ public class Driving extends OpMode {
             }
         }
         // 슈터 속도 조절
-        else if (gamepad2.dpadUpWasPressed())   { shooter.addTPS(100);}
-        else if (gamepad2.dpadDownWasPressed()) { shooter.addTPS(-100);}
-        else if (gamepad2.dpadLeftWasPressed()) { shooter.addLeftTPS(100);}
-        else if (gamepad2.dpadRightWasPressed()){ shooter.addRightTPS(100);}
+        else if (gamepad2.dpadUpWasPressed())   { shooter.addTPS(10);}
+        else if (gamepad2.dpadDownWasPressed()) { shooter.addTPS(-10);}
+        else if (gamepad2.dpadLeftWasPressed()) { shooter.addTPS(1);}
+        else if (gamepad2.dpadRightWasPressed()){ shooter.addTPS(-1);}
 
         // 서보 회전
         if (gamepad2.yWasPressed()) {
