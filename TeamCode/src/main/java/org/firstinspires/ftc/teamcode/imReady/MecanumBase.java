@@ -38,7 +38,7 @@ public class MecanumBase extends MecanumHardware {
             scale = 1.0 / max;
         }
 
-        if (rotate == 0) {
+        if (rotate == 0) {/// ///////////////////////////////////
             double error = targetYaw - currentYaw;
             if (error > 180) {
                 error -= 360;

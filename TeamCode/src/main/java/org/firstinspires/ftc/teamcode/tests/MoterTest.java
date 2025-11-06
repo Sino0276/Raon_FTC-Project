@@ -26,17 +26,16 @@ public class MoterTest extends OpMode {
 
     @Override
     public void init() {
-        mtr = hardwareMap.get(DcMotorEx.class, "mtr");
+        mtr = hardwareMap.get(DcMotorEx.class, "leftFront");
         mtrLoad();
     }
 
     @Override
     public void loop() {
+        mtrLoad();
+
         if (gamepad1.a) {
             move();
-        }
-        else if (gamepad1.y) {
-            mtrLoad();
         }
 
         showData();

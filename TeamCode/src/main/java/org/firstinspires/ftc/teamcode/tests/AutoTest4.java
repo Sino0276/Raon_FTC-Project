@@ -31,14 +31,12 @@ import org.firstinspires.ftc.teamcode.roadRunner.MecanumDrive;
 //                .waitSeconds(1)
                 .strafeToSplineHeading(new Vector2d(40.45, 32), Math.toRadians(180));
 
-
         Action trajectoryActionCloseOut = tab2.endTrajectory().fresh()
                 .strafeTo(new Vector2d(64.45, 12))
                 .build();
 
         // actions that need to happen on init; for instance, a claw tightening.
 //        Actions.runBlocking(claw.closeClaw());
-
 
         while (!isStopRequested() && !opModeIsActive()) {
             int position = visionOutputPosition;
@@ -57,8 +55,8 @@ import org.firstinspires.ftc.teamcode.roadRunner.MecanumDrive;
         Actions.runBlocking(
                 new SequentialAction(
                         tab1.build(),
-                        tab2.build(),
-                        trajectoryActionCloseOut
+                        tab2.build()
+//                        trajectoryActionCloseOut
                 )
         );
 
