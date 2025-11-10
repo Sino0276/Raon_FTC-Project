@@ -16,7 +16,6 @@ public abstract class CameraHardware {
     private final String WEBCAM_NAME = "Webcam 1"; // 웹캠 이름
     public AprilTagProcessor aprilTag; // AprilTag 프로세서
     public VisionPortal visionPortal; // 비전 포털
-    public List<AprilTagDetection> currentDetections;
 
     public CameraHardware(HardwareMap hardwareMap) {
         // AprilTag 프로세서 생성

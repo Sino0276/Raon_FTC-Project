@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 
+@Disabled
 @TeleOp(name = "FieldveiwTest", group = "java")
 public class FieldveiwTest extends LinearOpMode {
     @Override

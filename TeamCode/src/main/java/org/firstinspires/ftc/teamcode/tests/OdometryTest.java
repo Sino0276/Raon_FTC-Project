@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
+@Disabled
 @TeleOp(name = "OdometryTest", group = "java")
 public class OdometryTest extends LinearOpMode {
     private GoBildaPinpointDriver odo;
