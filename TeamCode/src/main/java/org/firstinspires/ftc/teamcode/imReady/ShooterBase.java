@@ -1,8 +1,12 @@
 package org.firstinspires.ftc.teamcode.imReady;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @Config
 public class ShooterBase extends ShooterHardware {
@@ -15,8 +19,51 @@ public class ShooterBase extends ShooterHardware {
     public boolean  isShooterSpin = false,
                     isServoSpin = false;
 
+    private CameraBase camera;
+
     public ShooterBase(HardwareMap hardwareMap) {
         super(hardwareMap);
+        camera = CameraBase.getInstance(hardwareMap);
+    }
+
+    public void Update(Gamepad gamepad) {
+//        shooterLeft.setPIDFCoefficients(DcMotorEx.RunMode.VELOCITY, SHOOTER_PID);
+//        shooterRight.setPIDFCoefficients(DcMotorEx.RunMode.VELOCITY, SHOOTER_PID);
+
+        if (gamepad.xWasPressed()) {
+
+            isShooterSpin = !isShooterSpin;
+            // if
+            if (isShooterSpin) {
+                if (camera.isTagVisible(20)) {
+                    AprilTagDetection detection = camera.getDetectionById(20);
+                    //   거리 기반 TPS 조절 (예시 값, 실제로는 거리 계산 필요)
+
+                } else {
+                    setVelocity(LEFT_TPS, RIGHT_TPS);
+                }
+
+            } else {
+                setPower(0, 0);
+            }
+        }
+        // 슈터 속도 조절
+        else if (gamepad.dpadUpWasPressed())   { addTPS(10);}
+        else if (gamepad.dpadDownWasPressed()) { addTPS(-10);}
+        else if (gamepad.dpadLeftWasPressed()) { addTPS(1);}
+        else if (gamepad.dpadRightWasPressed()){ addTPS(-1);}
+
+        // 서보 회전
+        if (gamepad.yWasPressed()) {
+
+            isServoSpin = !isServoSpin;
+            // if (servo.getPower() == SERVO_MIN) {  ㄱㄴ?
+            if (isServoSpin) {
+                servoSpin(SERVO_MAX);     // 여기
+            } else {
+                servoSpin(SERVO_MIN);     // 여기
+            }
+        }
     }
 
     public void setVelocity(int left_TPS, int right_TPS) {

@@ -9,16 +9,27 @@ import java.util.Comparator;
 import java.util.List;
 
 public class CameraBase extends CameraHardware {
+    // 싱글톤 인스턴스
+    private static CameraBase instance;
+
     private final int APRILTAG_FIRST_ID = 20;
     public List<AprilTagDetection> currentDetections;
 
-    public CameraBase(HardwareMap hardwareMap) {
+    private CameraBase(HardwareMap hardwareMap) {
         super(hardwareMap);
     }
 
     public void Update() {
         updateDetections();
 
+    }
+
+    // 싱글톤 패턴을 사용하여 인스턴스 반환
+    public static CameraBase getInstance(HardwareMap hardwareMap) {
+        if (instance == null) {
+            instance = new CameraBase(hardwareMap);
+        }
+        return instance;
     }
 
     public void enableCameraStreaming(int maxFps) {
