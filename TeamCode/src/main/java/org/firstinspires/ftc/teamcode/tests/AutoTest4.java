@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.roadRunner.MecanumDrive;
         int visionOutputPosition = 2;
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                .afterTime(0, () -> shoot.setVelocity(shoot.LEFT_TPS, shoot.RIGHT_TPS))
+                .afterTime(0, () -> shoot.setVelocity(shoot.TPS))
                 .afterTime(1, () -> shoot.servoSpin(1))
                 .afterTime(8, () -> shoot.servoSpin(0))
                 .turn(Math.toRadians(25));

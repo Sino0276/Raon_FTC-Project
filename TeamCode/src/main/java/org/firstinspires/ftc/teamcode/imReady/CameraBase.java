@@ -10,7 +10,7 @@ import java.util.List;
 
 public class CameraBase extends CameraHardware {
     // 싱글톤 인스턴스
-    private static CameraBase instance;
+    private static CameraBase instance = null;
 
     private final int APRILTAG_FIRST_ID = 20;
     public List<AprilTagDetection> currentDetections;
@@ -38,7 +38,6 @@ public class CameraBase extends CameraHardware {
 
     public void updateDetections() {
         currentDetections = aprilTag.getDetections();
-        currentDetections.sort(Comparator.comparingInt(detection -> detection.id));
     }
 
     public AprilTagDetection getDetectionById(int id) {
@@ -57,6 +56,12 @@ public class CameraBase extends CameraHardware {
             }
         }
         return false;
+    }
+
+    public void closeCamera() {
+        dashboard.stopCameraStream();
+        visionPortal.close();
+        instance = null;
     }
 
 }

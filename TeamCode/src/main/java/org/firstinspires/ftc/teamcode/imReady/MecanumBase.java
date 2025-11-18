@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.roadRunner.MecanumDrive;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @Config
 public class MecanumBase {
@@ -22,8 +23,10 @@ public class MecanumBase {
     private boolean isFieldCentric = true;  // 필드 중심 제어 (Field-Centric Drive)
 
     private MecanumDrive drive;
+    private CameraBase camera;
 
     public MecanumBase(HardwareMap hardwareMap, Pose2d pose2d) {
+        camera = CameraBase.getInstance(hardwareMap);
         drive = new MecanumDrive(hardwareMap, pose2d);
 
         lastHeading = currentHeading = targetHeading = postHeading = drive.localizer.getPose().heading.log();
@@ -39,6 +42,12 @@ public class MecanumBase {
 
         currentHeading = drive.localizer.getPose().heading.log();
         drive.updatePoseEstimate();
+
+        if (gamepad.b && camera.isTagVisible(20)) {
+            // 카메라가 태그 20을 인식 중일 때만 포스트 방향 갱신
+            AprilTagDetection detection = camera.getDetectionById(20);
+            targetHeading = currentHeading + detection.ftcPose.bearing;
+        }
 
         if (gamepad.dpad_up) {
             targetHeading = postHeading;
