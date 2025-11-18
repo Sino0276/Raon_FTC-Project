@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
-import java.util.Comparator;
 import java.util.List;
 
 public class CameraBase extends CameraHardware {
