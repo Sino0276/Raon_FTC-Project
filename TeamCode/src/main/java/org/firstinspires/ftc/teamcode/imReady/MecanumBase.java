@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.roadRunner.MecanumDrive;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -20,7 +21,7 @@ public class MecanumBase {
     private ElapsedTime time;
     private double lastTime = 0;
     private double speedMultiplier;
-    private boolean isFieldCentric = true;  // 필드 중심 제어 (Field-Centric Drive)
+    private boolean isFieldCentric = true; // 필드 중심 제어 (Field-Centric Drive)
 
     private MecanumDrive drive;
     private CameraBase camera;
@@ -33,12 +34,14 @@ public class MecanumBase {
         time = new ElapsedTime();
     }
 
-    public void Update(Gamepad gamepad) {
+    public void update(Gamepad gamepad) {
         double x = -gamepad.left_stick_x;
         double y = -gamepad.left_stick_y;
         double rx = -gamepad.right_stick_x;
 
-        if (gamepad.aWasPressed()) { isFieldCentric = !isFieldCentric; }
+        if (gamepad.aWasPressed()) {
+            isFieldCentric = !isFieldCentric;
+        }
 
         currentHeading = drive.localizer.getPose().heading.log();
         drive.updatePoseEstimate();
@@ -64,12 +67,14 @@ public class MecanumBase {
     }
 
     public void move(double x, double y, double rx) {
-        double xPower ,yPower, rotationPower;
+        double xPower, yPower, rotationPower;
 
         double dt = time.seconds() - lastTime;
         lastTime = time.seconds();
         double derivative = 0;
-        if (dt > 0) { derivative = normalizeAngle(currentHeading - lastHeading) / dt; }
+        if (dt > 0) {
+            derivative = normalizeAngle(currentHeading - lastHeading) / dt;
+        }
         lastHeading = currentHeading;
         if (rx == 0) {
             // rx 조이스틱을 완전히 놨을 때만 PD제어 작동
@@ -77,7 +82,7 @@ public class MecanumBase {
             rotationPower = (KP * headingError) - (KD * derivative);
 
             // 회전 속도 제한
-            rotationPower = Math.clamp(rotationPower, -1.0, 1.0);
+            rotationPower = Range.clip(rotationPower, -1.0, 1.0);
         } else {
             // 수동 회전 모드 또는 이동 중
             rotationPower = rx;
@@ -104,13 +109,14 @@ public class MecanumBase {
         // 로봇에 속도 명령 전송
         drive.setDrivePowers(new PoseVelocity2d(
                 input.times(speedMultiplier),
-                rotationPower * speedMultiplier
-        ));
+                rotationPower * speedMultiplier));
     }
 
     private double normalizeAngle(double angle) {
-        while (angle > Math.PI) angle -= 2 * Math.PI;
-        while (angle <= -Math.PI) angle += 2 * Math.PI;
+        while (angle > Math.PI)
+            angle -= 2 * Math.PI;
+        while (angle <= -Math.PI)
+            angle += 2 * Math.PI;
         return angle;
     }
 }

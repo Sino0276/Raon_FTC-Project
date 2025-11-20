@@ -18,7 +18,7 @@ public class CameraBase extends CameraHardware {
         super(hardwareMap);
     }
 
-    public void Update() {
+    public void update() {
         updateDetections();
 
     }

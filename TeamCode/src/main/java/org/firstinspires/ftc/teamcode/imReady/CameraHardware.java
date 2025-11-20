@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -25,20 +27,25 @@ public abstract class CameraHardware {
         // AprilTag 프로세서 생성
         aprilTag = new AprilTagProcessor.Builder()
                 .setOutputUnits(DistanceUnit.INCH, AngleUnit.RADIANS)
-                // .setLensIntrinsics()  // 캠 보정 (필요시 활성화)
+                .setCameraPose(
+                        new Position(DistanceUnit.MM, 180, 100, -170, 0),
+                        new YawPitchRollAngles(AngleUnit.RADIANS, 0, 0, 2 * Math.PI, 0))
+                // .setLensIntrinsics() // 캠 보정 (필요시 활성화)
                 .build();
 
         // 비전 포털 생성
         VisionPortal.Builder builder = new VisionPortal.Builder();
         if (USE_WEBCAM) {
             builder.setCamera(hardwareMap.get(WebcamName.class, WEBCAM_NAME));
-        } else { throw new IllegalStateException("Camera not initialized"); }
+        } else {
+            throw new IllegalStateException("Camera not initialized");
+        }
 
         // 카메라 해상도를 설정
-        //builder.setCameraResolution(new Size(640, 480));
+        // builder.setCameraResolution(new Size(640, 480));
 
         // 스트림 형식을 설정합니다. MJPEG는 기본 YUY2보다 적은 대역폭을 사용합니다.
-        //builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
+        // builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
 
         // 라이브 뷰 활성화
         builder.enableLiveView(true);
@@ -46,6 +53,6 @@ public abstract class CameraHardware {
         builder.addProcessor(aprilTag);
         // 비전 포털 빌드
         visionPortal = builder.build();
-//        dashboard.startCameraStream(visionPortal, 30); // 30 FPS로 스트리밍 시작
+        // dashboard.startCameraStream(visionPortal, 30); // 30 FPS로 스트리밍 시작
     }
 }
