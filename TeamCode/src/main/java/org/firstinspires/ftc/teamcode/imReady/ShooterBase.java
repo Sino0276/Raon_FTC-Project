@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
@@ -15,6 +16,10 @@ public class ShooterBase extends ShooterHardware {
     public static double DEFAULT_TPS = 1000;
     public static double SERVO_MAX = 0.8;
     public static double SERVO_MIN = 0;
+    public static double SERVO_WAIT_TIME = 1000; // ms
+
+    private ElapsedTime shootTimer = new ElapsedTime();
+    private boolean isShooting = false;
 
     // 물리적 제원 (보정)
     public static double FLYWHEEL_RADIUS = 1.889765; // 바퀴 반지름
@@ -28,22 +33,19 @@ public class ShooterBase extends ShooterHardware {
     private final double theta = 0.872665; // 기본 발사 각도 (rad)
     private final double g = 386.1; // 중력 가속도 (in/s^2)
 
-    public boolean isShooterSpin = false,
-            isServoSpin = false;
+    public boolean isShooterSpin = false;
 
     private CameraBase camera;
 
     public ShooterBase(HardwareMap hardwareMap) {
         super(hardwareMap);
         camera = CameraBase.getInstance(hardwareMap);
+        setServoPosition(SERVO_MIN);
     }
 
     public void update(Gamepad gamepad) {
         shooterLeft.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, SHOOTER_PID);
         shooterRight.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, SHOOTER_PID);
-
-        if (gamepad.bWasPressed())
-            gamepad.rumble(1000);
 
         if (gamepad.xWasPressed()) {
 
@@ -93,16 +95,12 @@ public class ShooterBase extends ShooterHardware {
         }
 
         // 서보 회전
-        if (gamepad.yWasPressed()) {
-
-            isServoSpin = !isServoSpin;
-            // if (servo.getPower() == SERVO_MIN) { ㄱㄴ?
-            if (isServoSpin) {
-                servoSpin(SERVO_MAX); // 여기
-            } else {
-                servoSpin(SERVO_MIN); // 여기
-            }
+        // 서보 회전
+        if (gamepad.y) {
+            pushBall();
         }
+        updateCycle();
+
     }
 
     public void setVelocity(double TPS) {
@@ -155,8 +153,34 @@ public class ShooterBase extends ShooterHardware {
 
     // servo
 
-    public void servoSpin(double power) {
-        servo.setPower(power);
+    public void setServoPosition(double position) {
+        servo.setPosition(position);
         // servo.getController().getServoPosition();
+    }
+
+    public void pushBall() {
+        if (!isShooting) {
+            isShooting = true;
+            shootTimer.reset();
+            setServoPosition(SERVO_MAX);
+        }
+    }
+
+    public boolean updateCycle() {
+        boolean returnValue = false;
+
+        if (isShooting) {
+            if (shootTimer.milliseconds() > SERVO_WAIT_TIME) {
+                setServoPosition(SERVO_MIN);
+                returnValue = true;
+            }
+
+            if (shootTimer.milliseconds() > SERVO_WAIT_TIME * 2) {
+                isShooting = false;
+                returnValue = false;
+            }
+        }
+
+        return returnValue;
     }
 }

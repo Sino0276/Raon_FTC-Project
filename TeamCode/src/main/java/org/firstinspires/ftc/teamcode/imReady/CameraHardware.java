@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -26,10 +27,10 @@ public abstract class CameraHardware {
         dashboard = FtcDashboard.getInstance();
         // AprilTag 프로세서 생성
         aprilTag = new AprilTagProcessor.Builder()
-                .setOutputUnits(DistanceUnit.INCH, AngleUnit.RADIANS)
                 .setCameraPose(
-                        new Position(DistanceUnit.MM, 180, 100, -170, 0),
-                        new YawPitchRollAngles(AngleUnit.RADIANS, 0, 0, 2 * Math.PI, 0))
+        new Position(DistanceUnit.MM, 180, 100, -170, 0),
+        new YawPitchRollAngles(AngleUnit.RADIANS, 0, 0, Math.PI, 0))
+                .setOutputUnits(DistanceUnit.INCH, AngleUnit.RADIANS)
                 // .setLensIntrinsics() // 캠 보정 (필요시 활성화)
                 .build();
 

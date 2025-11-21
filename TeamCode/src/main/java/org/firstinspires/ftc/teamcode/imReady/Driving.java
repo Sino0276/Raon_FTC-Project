@@ -52,6 +52,9 @@ public class Driving extends OpMode {
     public void stop() {
         super.stop();
         camera.closeCamera();
+        multipleTelemetry.update();
+
+        dashboard.sendTelemetryPacket(packet);
     }
 
     private void showData() {
@@ -64,8 +67,9 @@ public class Driving extends OpMode {
         multipleTelemetry.addData("Shooter Efficency", ShooterBase.SHOOTER_EFFICENCY);
         multipleTelemetry.addData("Distance",
                 camera.isTagVisible(20) ? camera.getDetectionById(20).ftcPose.y : "No Tag");
-        multipleTelemetry.update();
 
+        multipleTelemetry.addData("Robot Pose", camera.isTagVisible(23) ? camera.getRobotPoseFromTag(23) : "No Tag");
+        multipleTelemetry.update();
         dashboard.sendTelemetryPacket(packet);
     }
 }

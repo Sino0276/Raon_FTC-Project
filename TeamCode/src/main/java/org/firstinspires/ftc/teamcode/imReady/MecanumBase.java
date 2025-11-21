@@ -49,7 +49,8 @@ public class MecanumBase {
         if (gamepad.b && camera.isTagVisible(20)) {
             // 카메라가 태그 20을 인식 중일 때만 포스트 방향 갱신
             AprilTagDetection detection = camera.getDetectionById(20);
-            targetHeading = currentHeading + detection.ftcPose.bearing;
+            targetHeading = currentHeading - camera.getDetectionById(20).ftcPose.bearing + camera.BEARING_OFFSET;;
+
         }
 
         if (gamepad.dpad_up) {
@@ -61,7 +62,7 @@ public class MecanumBase {
         } else if (gamepad.dpad_right) {
             targetHeading = postHeading + Math.toRadians(270);
         } else {
-            speedMultiplier = (gamepad.right_bumper || gamepad.left_bumper) ? 0.4 : 0.8;
+            speedMultiplier = (gamepad.right_bumper || gamepad.left_bumper) ? 0.3 : 0.7;
             move(x, y, rx);
         }
     }
@@ -118,5 +119,14 @@ public class MecanumBase {
         while (angle <= -Math.PI)
             angle += 2 * Math.PI;
         return angle;
+    }
+
+    public void turnToAprilTag(int id) {
+        if (camera.isTagVisible(id)) {
+            AprilTagDetection detection = camera.getDetectionById(20);
+            targetHeading = currentHeading - camera.getDetectionById(20).ftcPose.bearing + camera.BEARING_OFFSET;
+
+//            MecanumDrive.FollowTrajectoryAction trajectoryAction =
+        }
     }
 }
