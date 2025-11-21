@@ -52,38 +52,14 @@ public class ShooterBase extends ShooterHardware {
             isShooterSpin = !isShooterSpin;
             if (isShooterSpin) {
 
-                if (camera.isTagVisible(20)) {
-                    AprilTagDetection detection = camera.getDetectionById(20);
-                    // 거리 기반 TPS 조절 (예시 값, 실제로는 거리 계산 필요)
-                    x = detection.ftcPose.y;
+                if      (camera.isTagVisible(20)) { activeShooterTps(camera.getDetectionById(20)); }
+                else if (camera.isTagVisible(24)) { activeShooterTps(camera.getDetectionById(24)); }
+                else                                 { setVelocity(DEFAULT_TPS); }
 
-                    // 발사 불가능한 각도인지 (Shadow Zone)체크
-                    // 즉, 발사 각도로는 해당 높이(y)에 도달할 수 없음을 의미
-                    double discriminat = (x * Math.tan(theta)) - delta_h;
-                    if (discriminat > 0) {
-                        // 초기 선속도(v0)
-                        double v0 = Math.sqrt((g * x * x) / (2 * Math.pow(Math.cos(theta), 2) * discriminat));
-                        // 선속도(v0) -> TPS 변환
-                        double requiredTPS = calculateTPSFromVelocity(v0);
-                        setVelocity(requiredTPS);
-                    } else {
-                        setVelocity(DEFAULT_TPS);
-                    }
-
-                } else {
-                    setVelocity(DEFAULT_TPS);
-                }
-
-            } else {
-                setPower(0);
-            } // 모터 꺼짐
+            } else { setPower(0); } // 모터 꺼짐
         }
 
-        // 슈터 속도 조절
-        // if (gamepad.dpadUpWasPressed()) { addTPS(10);}
-        // else if (gamepad.dpadDownWasPressed()) { addTPS(-10);}
-        // else if (gamepad.dpadLeftWasPressed()) { addTPS(1);}
-        // else if (gamepad.dpadRightWasPressed()){ addTPS(-1);}
+        // 슈터 효율 조절
         if (gamepad.dpadUpWasPressed()) {
             SHOOTER_EFFICENCY += 0.01;
         } else if (gamepad.dpadDownWasPressed()) {
@@ -94,7 +70,6 @@ public class ShooterBase extends ShooterHardware {
             SHOOTER_EFFICENCY -= 0.001;
         }
 
-        // 서보 회전
         // 서보 회전
         if (gamepad.y) {
             pushBall();
@@ -132,6 +107,24 @@ public class ShooterBase extends ShooterHardware {
         setTPS(TPS + amount);
     }
 
+    public void activeShooterTps(AprilTagDetection detection) {
+        // 거리 기반 TPS 조절 (예시 값, 실제로는 거리 계산 필요)
+        x = detection.ftcPose.y;
+
+        // 발사 불가능한 각도인지 (Shadow Zone)체크
+        // 즉, 발사 각도로는 해당 높이(y)에 도달할 수 없음을 의미
+        double discriminat = (x * Math.tan(theta)) - delta_h;
+        if (discriminat > 0) {
+            // 초기 선속도(v0)
+            double v0 = Math.sqrt((g * x * x) / (2 * Math.pow(Math.cos(theta), 2) * discriminat));
+            // 선속도(v0) -> TPS 변환
+            double requiredTPS = calculateTPSFromVelocity(v0);
+            setVelocity(requiredTPS);
+        } else {
+            setVelocity(DEFAULT_TPS);
+        }
+    }
+
     /**
      * 이론적 선속도(v0)를 목표 TPS로 변환
      * 공식: TPS (v0 / (r * efficiency)) * (ticks_per_rev) / (2 * pi)) * gear_ratio
@@ -166,6 +159,16 @@ public class ShooterBase extends ShooterHardware {
         }
     }
 
+    /**
+     * 루프 방식이 아닌 자율주행의 순차적 진행 방식에선
+     * while문을 묶어서 사용하자
+     * <p>
+     * pushBall()과 updateCycle() 메소드는 한 묶음이며,
+     * updateCycle() 메소드는 반복되며 조건문을 처리하지 않으면
+     * 서보가 원위치로 돌아오지 않는다.
+     *
+     * @return 서보가 제자리로 돌아오면 false를 반환 / 아직 돌아오지 않았다면 true를 반환
+     */
     public boolean updateCycle() {
         boolean returnValue = false;
 

@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.imReady;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -46,10 +48,18 @@ public class MecanumBase {
         currentHeading = drive.localizer.getPose().heading.log();
         drive.updatePoseEstimate();
 
-        if (gamepad.b && camera.isTagVisible(20)) {
-            // 카메라가 태그 20을 인식 중일 때만 포스트 방향 갱신
-            AprilTagDetection detection = camera.getDetectionById(20);
-            targetHeading = currentHeading - camera.getDetectionById(20).ftcPose.bearing + camera.BEARING_OFFSET;;
+        if (gamepad.bWasPressed()) {
+            // 카메라가 태그 20을 인식 중일 때만 방향 갱신
+            if (camera.isTagVisible(20)) {
+                turnToAprilTag(camera.getDetectionById(20));
+            }
+            // 카메라가 태그 24를 인식 중일 때만 방향 갱신
+            else if (camera.isTagVisible(24)) {
+                turnToAprilTag(camera.getDetectionById(24));
+            }
+
+//            AprilTagDetection detection = camera.getDetectionById(20);
+//            targetHeading = currentHeading - camera.getDetectionById(20).ftcPose.bearing + camera.BEARING_OFFSET;;
 
         }
 
@@ -65,6 +75,14 @@ public class MecanumBase {
             speedMultiplier = (gamepad.right_bumper || gamepad.left_bumper) ? 0.3 : 0.7;
             move(x, y, rx);
         }
+    }
+
+    /**
+     * MecanumDrive 인스턴스를 반환
+     * @return MecanumDrive
+     */
+    public MecanumDrive getRoadRunnerDrive() {
+        return drive;
     }
 
     public void move(double x, double y, double rx) {
@@ -121,12 +139,19 @@ public class MecanumBase {
         return angle;
     }
 
-    public void turnToAprilTag(int id) {
-        if (camera.isTagVisible(id)) {
-            AprilTagDetection detection = camera.getDetectionById(20);
-            targetHeading = currentHeading - camera.getDetectionById(20).ftcPose.bearing + camera.BEARING_OFFSET;
+    /**
+     * AprilTag null Check하기
+     * @param detection
+     */
+    public void turnToAprilTag(AprilTagDetection detection) {
+        Action TurnAction = drive.actionBuilder(drive.localizer.getPose())
+                .turn(-detection.ftcPose.bearing + CameraBase.BEARING_OFFSET)
+                .build();
 
-//            MecanumDrive.FollowTrajectoryAction trajectoryAction =
-        }
+        Actions.runBlocking(TurnAction);
+        drive.updatePoseEstimate();
+        currentHeading = drive.localizer.getPose().heading.log();
+        targetHeading = currentHeading;
+
     }
 }

@@ -71,28 +71,6 @@ public class CameraBase extends CameraHardware {
         return null; // 해당 ID의 태그가 감지되지 않음
     }
 
-    public double getCorrectedBearing(AprilTagDetection detection, double camXOffset, double camYOffset) {
-        // 1. 기존 데이터 가져오기 (Degree -> Radian 변환 필수)
-        double range = detection.ftcPose.range;
-        double bearingRad = Math.toRadians(detection.ftcPose.bearing);
-
-        // 2. 카메라 기준의 태그 좌표 계산 (전방이 X, 좌측이 Y라고 가정)
-        // 주의: 삼각함수 축은 로봇의 좌표계 설정에 따라 cos/sin이 달라질 수 있습니다.
-        // 일반적인 수학 좌표계(X가 가로)와 로봇 좌표계(X가 전방) 차이를 주의하세요.
-        // 여기서는 FTC 일반적인 Pose 기준(X: 전방, Y: 좌측)으로 작성합니다.
-        double tagXCam = range * Math.cos(bearingRad);
-        double tagYCam = range * Math.sin(bearingRad);
-
-        // 3. 오프셋 적용 (로봇 중심 좌표로 변환)
-        double targetX = tagXCam + camXOffset;
-        double targetY = tagYCam + camYOffset;
-
-        // 4. 새로운 각도(Bearing) 계산 (Radian -> Degree 복구)
-        double correctedBearingRad = Math.atan2(targetY, targetX);
-
-        return correctedBearingRad;
-    }
-
     public void closeCamera() {
         dashboard.stopCameraStream();
         visionPortal.close();
