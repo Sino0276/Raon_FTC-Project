@@ -16,7 +16,7 @@ public class ShooterBase extends ShooterHardware {
     public static double DEFAULT_TPS = 1000;
     public static double SERVO_MAX = 0.8;
     public static double SERVO_MIN = 0;
-    public static double SERVO_WAIT_TIME = 1000; // ms
+    public static double SERVO_WAIT_TIME = 1100; // ms
 
     private ElapsedTime shootTimer = new ElapsedTime();
     private boolean isShooting = false;
