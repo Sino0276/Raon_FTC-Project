@@ -9,7 +9,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
-@TeleOp(name = "OdometryTest", group = "java")
+@Disabled
+@TeleOp(name = "OdometryTest", group = "Test")
 public class OdometryTest extends LinearOpMode {
     private GoBildaPinpointDriver odo;
 
@@ -20,7 +21,8 @@ public class OdometryTest extends LinearOpMode {
 
         odo = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         odo.initialize();
-        odo.setOffsets(3, -72, DistanceUnit.MM);
+//        odo.setOffsets(3, -72, DistanceUnit.MM);
+        odo.setOffsets(-5, -62.5, DistanceUnit.MM);
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 

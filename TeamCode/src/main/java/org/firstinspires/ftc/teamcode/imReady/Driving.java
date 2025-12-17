@@ -1,110 +1,75 @@
 package org.firstinspires.ftc.teamcode.imReady;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 @TeleOp(name = "Driving", group = "Ready")
 public class Driving extends OpMode {
 
+    private CameraBase camera;
     private MecanumBase drive;
     private ShooterBase shooter;
-//    private SampleMecanumDrive driveTrain;
-    private FtcDashboard dashboard = FtcDashboard.getInstance();
-    private TelemetryPacket packet = new TelemetryPacket();
+
+    private FtcDashboard dashboard;
+    private TelemetryPacket packet;
+    private MultipleTelemetry multipleTelemetry;
 
     @Override
     public void init() {
-        drive = new MecanumBase(hardwareMap);
+        camera = CameraBase.getInstance(hardwareMap);
+        drive = new MecanumBase(hardwareMap, new Pose2d(0, 0, 0));
         shooter = new ShooterBase(hardwareMap);
-//        driveTrain = new SampleMecanumDrive(hardwareMap);
 
+        dashboard = FtcDashboard.getInstance();
+        packet = new TelemetryPacket();
+        multipleTelemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
+
+        camera.enableCameraStreaming(30);
         dashboard.sendTelemetryPacket(packet);
 
     }
 
     @Override
     public void loop() {
-        drive();
-        // gamepad2 (Shooter) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        shooter();
+        // camera
+        camera.update();
 
+        // gamepad1 (Drive)
+        drive.update(gamepad1);
+
+        // gamepad2 (Shooter)
+        shooter.update(gamepad2);
+
+        // display data
         showData();
     }
 
-    private void drive()
-    {
-        drive.updatePinpoint();
-        drive.getCurrentYaw();
+    @Override
+    public void stop() {
+        super.stop();
+        camera.closeCamera();
+        multipleTelemetry.update();
 
-        if (gamepad1.dpad_up) {
-            drive.targetYaw = drive.postYaw;
-//            drive.rotate();
-        } else if (gamepad1.dpad_left) {
-            drive.targetYaw = drive.postYaw + 90;
-//            drive.rotate();
-        } else if (gamepad1.dpad_down) {
-            drive.targetYaw = drive.postYaw + 180;
-//            drive.rotate();
-        } else if (gamepad1.dpad_right) {
-            drive.targetYaw = drive.postYaw + 270;
-//            drive.rotate();
-        } else {
-
-            double forward = gamepad1.left_stick_y;
-            double sideways = gamepad1.left_stick_x;
-            double rotate = -gamepad1.right_stick_x;
-
-            drive.setSpeed(forward, sideways, rotate);
-        }
-    }
-
-    private void shooter() {
-        if (gamepad2.aWasPressed()) {
-
-            shooter.isShooterSpin = !shooter.isShooterSpin;
-            if (shooter.isShooterSpin) {
-                shooter.setVelocity(shooter.TPS);
-            } else {
-                shooter.setPower(0);
-            }
-        }
-        // 슈터 속도 조절
-        else if (gamepad2.dpadUpWasPressed()) { shooter.addTPS(100);}
-        else if (gamepad2.dpadDownWasPressed()) { shooter.addTPS(-100);}
-
-        // 서보 회전
-        if (gamepad2.bWasPressed()) {
-
-            shooter.isServoSpin = !shooter.isServoSpin;
-            if (shooter.isServoSpin) {
-                shooter.servoSpin(1);        // 여기
-            } else {
-                shooter.servoSpin(0);     // 여기
-            }
-        }
+        dashboard.sendTelemetryPacket(packet);
     }
 
     private void showData() {
-        packet.put("Encoder_X", drive.pinpoint.getEncoderX());
-        packet.put("Encoder_Y", drive.pinpoint.getEncoderY());
-        packet.put("Pos_X", drive.pinpoint.getPosX(DistanceUnit.INCH));
-        packet.put("Pos_Y", drive.pinpoint.getPosY(DistanceUnit.INCH));
-//                packet.put("Velocity_X", odo.getVelX(DistanceUnit.INCH));
-//                packet.put("Velocity_Y", odo.getVelY(DistanceUnit.INCH));
-        packet.put("getHeading", drive.pinpoint.getHeading(AngleUnit.DEGREES));
-        packet.put("pos.getHeading", drive.pinpoint.getPosition().getHeading(AngleUnit.DEGREES));
-        packet.put("Pos", drive.pinpoint.getPosition());
+        multipleTelemetry.addData("Shooter TargetTPS", ShooterBase.TPS);
+        multipleTelemetry.addData("Shooter CurrnetLeftTPS", shooter.shooterLeft.getVelocity());
+        multipleTelemetry.addData("Shooter CurrnetRightTPS", shooter.shooterRight.getVelocity());
+        multipleTelemetry.addData("Shooter CurrnetAvgTPS",
+                (shooter.shooterLeft.getVelocity() + shooter.shooterRight.getVelocity()) / 2);
+        multipleTelemetry.addData("AprilTag", camera.isTagVisible(20));
+        multipleTelemetry.addData("Shooter Efficency", ShooterBase.SHOOTER_EFFICENCY);
+        multipleTelemetry.addData("Distance",
+                camera.isTagVisible(20) ? camera.getDetectionById(20).ftcPose.y : "No Tag");
 
-        packet.put("targetYaw", drive.targetYaw);
-        packet.put("currentYaw", drive.currentYaw);
-        packet.put("postYaw", drive.postYaw);
-
+        multipleTelemetry.addData("Robot Pose", camera.isTagVisible(23) ? camera.getRobotPoseFromTag(23) : "No Tag");
+        multipleTelemetry.update();
         dashboard.sendTelemetryPacket(packet);
     }
 }

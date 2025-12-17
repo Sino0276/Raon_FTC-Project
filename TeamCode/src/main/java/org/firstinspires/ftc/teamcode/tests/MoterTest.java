@@ -3,14 +3,16 @@ package org.firstinspires.ftc.teamcode.tests;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+@Disabled
 @Config
-@TeleOp(name = "mtrTest", group = "java")
+@TeleOp(name = "mtrTest", group = "Test")
 public class MoterTest extends OpMode {
     public static PIDFCoefficients DRIVE_PID = new PIDFCoefficients(5, 2, 1, 11);
     /// max TPS == 2800
@@ -26,17 +28,16 @@ public class MoterTest extends OpMode {
 
     @Override
     public void init() {
-        mtr = hardwareMap.get(DcMotorEx.class, "mtr");
+        mtr = hardwareMap.get(DcMotorEx.class, "leftFront");
         mtrLoad();
     }
 
     @Override
     public void loop() {
+        mtrLoad();
+
         if (gamepad1.a) {
             move();
-        }
-        else if (gamepad1.y) {
-            mtrLoad();
         }
 
         showData();
