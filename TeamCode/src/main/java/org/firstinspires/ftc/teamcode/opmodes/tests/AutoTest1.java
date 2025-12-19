@@ -1,21 +1,20 @@
-package org.firstinspires.ftc.teamcode.tests;
+package org.firstinspires.ftc.teamcode.opmodes.tests;
 
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.*;
 
 import org.firstinspires.ftc.teamcode.roadRunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.tuning.TuningOpModes;
 
-@Autonomous(name = "AutoTest2", group = "Test")
-public class AutoTest2 extends LinearOpMode {
+@Autonomous(name = "AutoTest1", group = "Test")
+public class AutoTest1 extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        Pose2d beginPose = new Pose2d(64.45, 60, Math.PI); // 시작 위치
-        Vector2d endPose = new Vector2d(64.45, 12); // 목적지 위치
+        Pose2d beginPose = new Pose2d(64.45, 12, Math.PI); // 시작 위치
+        Vector2d endPose = new Vector2d(64.45, 60); // 목적지 위치
         if (TuningOpModes.DRIVE_CLASS.equals(MecanumDrive.class)) {
             MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
 

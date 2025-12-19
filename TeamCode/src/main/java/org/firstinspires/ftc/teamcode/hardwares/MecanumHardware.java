@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.imReady;
+package org.firstinspires.ftc.teamcode.hardwares;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;

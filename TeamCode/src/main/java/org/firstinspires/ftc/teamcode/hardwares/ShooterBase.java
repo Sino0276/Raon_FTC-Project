@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.imReady;
+package org.firstinspires.ftc.teamcode.hardwares;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;

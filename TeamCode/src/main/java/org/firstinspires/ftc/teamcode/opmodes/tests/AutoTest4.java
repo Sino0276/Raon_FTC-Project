@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tests;
+package org.firstinspires.ftc.teamcode.opmodes.tests;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -8,7 +8,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 
-import org.firstinspires.ftc.teamcode.imReady.ShooterBase;
+import org.firstinspires.ftc.teamcode.hardwares.ShooterBase;
 import org.firstinspires.ftc.teamcode.roadRunner.MecanumDrive;
 
 @Autonomous(name = "AutoTest4", group = "Test")

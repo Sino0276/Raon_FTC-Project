@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.imReady;
+package org.firstinspires.ftc.teamcode.opmodes.Auto;
 
 import androidx.annotation.NonNull;
 
@@ -12,6 +12,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.hardwares.CameraBase;
+import org.firstinspires.ftc.teamcode.hardwares.MecanumBase;
+import org.firstinspires.ftc.teamcode.hardwares.ShooterBase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @Autonomous(name = "AutoDrivingRED-Long", group = "imReady")
