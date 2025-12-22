@@ -13,6 +13,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.List;
 
+@Disabled
 @TeleOp(name = "CamTest", group = "Test")
 public class CamTest extends OpMode {
     private final boolean USE_WEBCAM = true; // true for webcam, false for phone camera

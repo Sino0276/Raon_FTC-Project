@@ -32,7 +32,7 @@ public class VisionSubsystem extends SubsystemBase {
     public VisionSubsystem(HardwareMap hardwareMap, String webcamName) {
         // 1. AprilTag 프로세서 빌드
         aprilTag = new AprilTagProcessor.Builder()
-                .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
+                .setOutputUnits(DistanceUnit.MM, AngleUnit.DEGREES)
                 // ftc-docs.firstinspires.org/en/latest/programming_resources/vision/camera_calibration/camera-calibration.html
                 // .setLensIntrinsics(...) // 필요 시 카메라 캘리브레이션 값 입력 (중요)
                 // fx, fy, cx, cy
@@ -84,7 +84,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     /**
-     * [Flywheel용] 태그까지의 거리를 반환. (단위: Inch)
+     * [Flywheel용] 태그까지의 거리를 반환. (단위: MM)
      * 감지되지 않으면 -1을 반환.
      */
     public double getDistance(int id) {
@@ -92,7 +92,7 @@ public class VisionSubsystem extends SubsystemBase {
         if (detection != null) {
             // ftcPose.y : 카메라 정면 방향 거리 (평면 거리)
             // ftcPose.range : 3차원 직선 거리 (대각선)
-            // 플라이휠 거리 계산에는 보통 바닥 평면 거리인 y를 씁니다.
+
             return detection.ftcPose.y;
         }
         return -1.0;

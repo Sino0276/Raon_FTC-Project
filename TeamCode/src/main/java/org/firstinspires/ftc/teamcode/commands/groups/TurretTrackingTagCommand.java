@@ -8,24 +8,31 @@ import com.pedropathing.geometry.Pose;
 
 import org.firstinspires.ftc.teamcode.subsystems.TurretSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
+/**
+ * 1. Import 확인: com.pedropathing.localization.Pose 인지 geometry.Pose 인지 확인하여 빨간 줄이 뜨면 수정해주세요. <p>
+ * 2. 부호 테스트: 실제 주행 시 터렛이 반대로 돌면 + vision.getAngle을 -로, 혹은 fieldHeading - robotHeading을 + 등으로 상황에 맞춰 부호만 바꿔주시면 됩니다.
+ */
 public class TurretTrackingTagCommand extends CommandBase {
     private final TurretSubsystem turret;
     private final VisionSubsystem vision;
     private final Follower follower;
     private final int tagID;
-    private AprilTagDetection aprilTag;
-    private double angle;
 
+    /**
+     * @param turret turretSubsystem
+     * @param vision cameraSubsystem
+     * @param follower PedroPathing follower
+     * @param tagID AprilTag ID
+     */
     public TurretTrackingTagCommand(TurretSubsystem turret, VisionSubsystem vision, Follower follower, int tagID) {
         this.turret = turret;
         this.vision = vision;
         this.tagID = tagID;
         this.follower = follower;
 
-
-        addRequirements(turret, vision);
+        // Vision은 읽기만 할것이기에 서브시스템에 추가(독점)하지 않음 -> 병렬 실행 가능
+        addRequirements(turret);
     }
 
     // 커맨드 실행 중
@@ -33,35 +40,45 @@ public class TurretTrackingTagCommand extends CommandBase {
     public void execute() {
         double targetAngle;
 
-        // 1. 카메라에 태그가 보이는지 확인
+        // 1. Vision 기반 추적 (Closed-Loop)
         if (vision.isTagVisible(tagID)) {
-            // [Vision] 현재 각도 + 오차(Bearing) = 목표 절대 각도
-            // 예: 현재 30도, 오차 +10도(왼쪽) -> 40도를 바라봐라
-            targetAngle = turret.getAngle() + vision.getAngle(tagID);
+            // 공식: 현재 터렛 절대 각도 + 카메라가 본 오차 각도
+            /*
+            B. Vision Latency 보정 부재
+
+            파일: TurretTrackingTagCommand.java
+
+            현상: targetAngle = turret.getAngle() + vision.getAngle(tagID)
+
+            문제: 카메라는 과거의 정보(수십~수백 ms 전)를 줍니다. 터렛이 회전하고 있는 도중에 이 수식을 쓰면, 카메라가 찍힌 시점의 터렛 각도가 아닌 '현재' 터렛 각도에 '과거' 오차를 더하게 되어 **오실레이션(떨림)**이 발생할 수 있습니다.
+
+            해결: 터렛이 고속으로 움직일 때는 오차가 큽니다. 터렛이 거의 멈췄을 때만 비전 보정을 하거나, poseNet 처럼 카메라 캡처 타임스탬프를 이용한 복잡한 보정이 필요합니다. (초보자라면 일단 감수하고 사용하되, P게인을 낮게 잡으세요.)
+             */
+            targetAngle = turret.getAngle() + vision.getAngle(tagID);   // 부호 확인
         }
-        // 2. 태그가 안 보이면 오도메트리 사용
+
+        // 2. Odometry 기반 추적 (Open-Loop / Fallback)
         else {
-            // 태그 정보가 없으면 현재 각도 유지 (혹은 0도 정렬)
             if (!APRILTAG_POS.containsKey(tagID)) {
-                targetAngle = turret.getAngle();
+                targetAngle = turret.getAngle(); // 정보 없으면 현상 유지
             } else {
                 Pose tagPose = APRILTAG_POS.get(tagID);
                 Pose robotPose = follower.getPose();
 
-                // 1. 태그 방향 벡터 각도 (필드 절대 각도)
-                double deltaX = tagPose.getX() - robotPose.getX();
-                double deltaY = tagPose.getY() - robotPose.getY();
+                // 필드 절대 각도 (내 위치 -> 태그 위치)
+                double deltaX = tagPose.getX() - (robotPose.getX() * 25.4);
+                double deltaY = tagPose.getY() - (robotPose.getY() * 25.4);
                 double fieldHeading = Math.toDegrees(Math.atan2(deltaY, deltaX));
 
-                // 2. 로봇 헤딩 보정 (필드 각도 - 로봇 헤딩 = 터렛 목표 각도)
+                // 로봇 헤딩 보정
                 double robotHeading = Math.toDegrees(robotPose.getHeading());
 
-                // 이것이 바로 터렛이 바라봐야 할 '목표 각도'입니다.
-                targetAngle = fieldHeading - robotHeading;
+                // 터렛이 봐야 할 절대 각도
+                targetAngle = fieldHeading - robotHeading;  // 부호 확인
             }
         }
 
-        // 최종 계산된 '목표 각도'로 이동 (TurnToAngle 내부에서 정규화/Safe Limit 처리됨)
+        // 최종 명령: 계산된 절대 각도로 회전
         turret.turnToAngle(targetAngle);
     }
 

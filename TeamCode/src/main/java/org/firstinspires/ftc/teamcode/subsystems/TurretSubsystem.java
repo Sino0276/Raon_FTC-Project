@@ -16,8 +16,6 @@ public class TurretSubsystem extends SubsystemBase {
     // PIDF
     public static double
             kP = 0,
-            kI = 0,
-            kD = 0,
             kS = 0,
             kV = 0;
 
@@ -36,7 +34,7 @@ public class TurretSubsystem extends SubsystemBase {
         turretMotor.setInverted(false);
 
         // 모터 모드
-        turretMotor.setRunMode(Motor.RunMode.VelocityControl);
+        turretMotor.setRunMode(Motor.RunMode.PositionControl);
 
         // PIDF 계수 설정
         updateCoefficients();
@@ -50,7 +48,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void updateCoefficients() {
-        turretMotor.setVeloCoefficients(kP, kI, kD);
+        turretMotor.setPositionCoefficient(kP);
         turretMotor.setFeedforwardCoefficients(kS, kV);
     }
 

@@ -13,6 +13,16 @@ public class FlywheelSubsystem extends SubsystemBase {
 
     private MotorEx flywheelMotor;
 
+    // 물리적 제원 (보정)
+    public static double SHOOTER_EFFICIENCY = 0.58; // 효율계수 (0.0 ~ 1.0) 1은 슬립 X // 튜닝 할 것
+    private final double FLYWHEEL_RADIUS; // 바퀴 반지름
+    private final double GEAR_RATIO; // 기어비
+
+    // 포물선 운동 상수
+    private final double delta_h; // 수직 높이 차이 (mm)
+    private final double theta; // 기본 발사 각도 (rad)
+    private final double g = 9800; // 중력 가속도 (mm/s^2)
+
     // PIDF
     public static double kP = 0,
                          kI = 0,
@@ -29,7 +39,14 @@ public class FlywheelSubsystem extends SubsystemBase {
      * 모터 초기화 및 설정
      * @param hardwareMap
      */
-    public FlywheelSubsystem(HardwareMap hardwareMap, String motorName, Motor.GoBILDA motorType) {
+    public FlywheelSubsystem(HardwareMap hardwareMap, String motorName, Motor.GoBILDA motorType,
+                             double gearRatio, double shooterEfficiency, double flyWheelRadius, double delta_h, double theta) {
+        this.GEAR_RATIO = gearRatio;
+        this.SHOOTER_EFFICIENCY = shooterEfficiency;
+        this.FLYWHEEL_RADIUS = flyWheelRadius;
+        this.delta_h = delta_h;
+        this.theta = theta;
+
         // 플라이휠 초기화
         flywheelMotor = new MotorEx(hardwareMap, motorName, motorType);
 
@@ -88,11 +105,48 @@ public class FlywheelSubsystem extends SubsystemBase {
     public boolean isReady() {
         // [변경됨] CPR 값을 직접 호출하여 계산
         double cpr = flywheelMotor.getCPR();
-        double currentLeftRPM = (flywheelMotor.getCorrectedVelocity() * 60) / cpr;
-        double currentRightRPM = (flywheelMotor.getCorrectedVelocity() * 60) / cpr;
+        double currentRPM = (flywheelMotor.getCorrectedVelocity() * 60) / cpr;
 
-        double avgRPM = (Math.abs(currentLeftRPM) + Math.abs(currentRightRPM)) / 2.0;
-
-        return targetRPM > 0 && Math.abs(targetRPM - avgRPM) <= VELOCITY_TOLERANCE;
+        return targetRPM > 0 && Math.abs(targetRPM - Math.abs(currentRPM)) <= VELOCITY_TOLERANCE;
     }
+
+    /**
+     * @param distance distancUnit: MM
+     * @return
+     */
+    public double calculateShootingVelocity(double distance) {
+        double discriminant = (distance * Math.tan(theta)) - delta_h;
+
+        if (discriminant > 0) {
+            double v0 = Math.sqrt(
+                    (g * distance * distance) / (2 * Math.pow(Math.cos(theta), 2) * discriminant)
+            );
+
+            // 선속도(mm/s) -> 모터 RPM 변환
+            return calculateRPMFromVelocity(v0);
+        } else {
+            // 발사 불가능한 각도(위치)라면 모터 회전x
+            return 0;
+        }
+    }
+
+    /**
+     * 선속도(mm/s)를 모터 RPM으로 변환
+     */
+    private double calculateRPMFromVelocity(double v0) {
+        // 1. 휠의 접선 속도 (mm/s)
+        double wheelTangentialVelocity = v0 / SHOOTER_EFFICIENCY;
+
+        // 2. 휠의 각속도 (rad/s) = v / r
+        double angularVelocityRadPerSec = wheelTangentialVelocity / FLYWHEEL_RADIUS;
+
+        // 3. 각속도(rad/s) -> RPM 변환
+        // 1 rad/s = 60 / 2pi RPM
+        double flywheelRPM = angularVelocityRadPerSec * (60.0 / (2 * Math.PI));
+
+        // 4. 모터 기어비 적용 (터렛 쪽 기어비 공식과 동일)
+        return flywheelRPM * GEAR_RATIO;
+    }
+
+
 }
