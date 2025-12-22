@@ -5,10 +5,13 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
 
 public class TurretSubsystem extends SubsystemBase {
 
     private MotorEx turretMotor;
+    private final double ticksPerDegree; // 1도당 필요한 틱 수 (자동 계산됨)
+    private double power = 0.7;
 
     // PIDF
     public static double
@@ -19,9 +22,15 @@ public class TurretSubsystem extends SubsystemBase {
             kV = 0;
 
 
-    public TurretSubsystem(HardwareMap hardwareMap, String motorName) {
+    /**
+     * @param hardwareMap 하드웨어 맵
+     * @param motorName   설정된 모터 이름
+     * @param motorType   사용하는 모터의 종류 (예: Motor.GoBILDA.RPM_312)
+     * @param gearRatio   외부 기어비 (예: 5.0 = 5:1 감속)
+     */
+    public TurretSubsystem(HardwareMap hardwareMap, String motorName, Motor.GoBILDA motorType, double gearRatio) {
         // 모터 초기화
-        turretMotor = new MotorEx(hardwareMap, motorName, Motor.GoBILDA.RPM_312);
+        turretMotor = new MotorEx(hardwareMap, motorName, motorType);
 
         // 모터 반전 (모터의 회전 방향이 반대라면 수정)
         turretMotor.setInverted(false);
@@ -34,6 +43,10 @@ public class TurretSubsystem extends SubsystemBase {
 
         // ZeroPowerBehavior
         turretMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+
+        // 3. 기어비를 이용한 틱 변환 상수 계산
+        // 공식: (모터 CPR * 외부 기어비) / 360도
+        this.ticksPerDegree = (turretMotor.getCPR() * gearRatio) / 360.0;
     }
 
     public void updateCoefficients() {
@@ -41,8 +54,62 @@ public class TurretSubsystem extends SubsystemBase {
         turretMotor.setFeedforwardCoefficients(kS, kV);
     }
 
-    public void turn(double angle) {
+    /**
+     * @param power Range: -1.0 ~ 1.0
+     */
+    public void setSpeed(double power) {
+        this.power = Range.clip(power, -1.0, 1.0);
+    }
 
+    /**
+     * 터렛을 특정 각도로 회전시킵니다.
+     * @param angleDegrees 목표 각도 (도 단위)
+     */
+    public void turnToAngle(double angleDegrees) {
+        // 각도 정규화 (-180 ~ 180)
+        double targetAngle = Range.clip(normalizeAngle(angleDegrees), -90, 90);
+        int targetTicks = (int) (targetAngle * ticksPerDegree);
+
+        // 위치 제어로 변경 후 이동 (예시)
+        turretMotor.setRunMode(Motor.RunMode.PositionControl);
+        turretMotor.setTargetPosition(targetTicks);
+        turretMotor.set(power);
+    }
+
+    /**
+     * 현재 위치를 기준으로 특정 각도만큼 더 회전시킵니다. (상대 좌표)
+     * @param angleDegrees 더 회전할 각도 (도 단위)
+     */
+    public void turnAsAngle(double angleDegrees) {
+        double currentAngle = getAngle();
+        double newTargetAngle = currentAngle + angleDegrees;
+
+        // 절대 좌표 이동 함수 호출 (안전 범위 제한 등 재사용)
+        turnToAngle(newTargetAngle);
+    }
+
+    /**
+     * 입력된 각도를 -180 ~ 180 범위로 정규화합니다.
+     */
+    private double normalizeAngle(double degrees) {
+        while (degrees > 180) degrees -= 360;
+        while (degrees <= -180) degrees += 360;
+        return degrees;
+    }
+
+    /**
+     * 현재 터렛의 각도를 반환합니다.
+     * @return 각도 (도 단위)
+     */
+    public double getAngle() {
+        return turretMotor.getCurrentPosition() / ticksPerDegree;
+    }
+
+    /**
+     * 터렛을 정면(0도)으로 정렬합니다.
+     */
+    public void center() {
+        turnToAngle(0.0);
     }
 
     public void stop() {

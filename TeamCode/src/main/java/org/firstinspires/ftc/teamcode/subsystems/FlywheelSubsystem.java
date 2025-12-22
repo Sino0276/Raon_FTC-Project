@@ -29,9 +29,9 @@ public class FlywheelSubsystem extends SubsystemBase {
      * 모터 초기화 및 설정
      * @param hardwareMap
      */
-    public FlywheelSubsystem(HardwareMap hardwareMap, String motorName) {
+    public FlywheelSubsystem(HardwareMap hardwareMap, String motorName, Motor.GoBILDA motorType) {
         // 플라이휠 초기화
-        flywheelMotor = new MotorEx(hardwareMap, motorName, Motor.GoBILDA.BARE);
+        flywheelMotor = new MotorEx(hardwareMap, motorName, motorType);
 
         // 모터 반전 (모터의 회전 방향이 반대라면 수정)
         flywheelMotor.setInverted(false);

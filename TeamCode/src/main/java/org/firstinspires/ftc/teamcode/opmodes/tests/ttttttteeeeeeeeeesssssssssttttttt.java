@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -39,8 +40,8 @@ public class ttttttteeeeeeeeeesssssssssttttttt extends CommandOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         // 1. 하드웨어 & 서브시스템 초기화
-        flywheel = new FlywheelSubsystem(hardwareMap, "flywheelMotor"); // 모터 이름 확인
-        turret = new TurretSubsystem(hardwareMap, "turretMotor");
+        flywheel = new FlywheelSubsystem(hardwareMap, "flywheelMotor", Motor.GoBILDA.BARE); // 모터 이름 확인
+        turret = new TurretSubsystem(hardwareMap, "turretMotor", Motor.GoBILDA.RPM_312, (double) 70 / 10);
         vision = new VisionSubsystem(hardwareMap, "Webcam 1");
 
         // PedroPathing Follower 초기화
