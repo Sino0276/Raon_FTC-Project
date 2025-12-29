@@ -13,9 +13,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.commands.groups.FlywheelWithTagCommand;
 import org.firstinspires.ftc.teamcode.commands.groups.TurretTrackingTagCommand;
-import org.firstinspires.ftc.teamcode.commands.mech.FlywheelCommand;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.FlywheelSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.TurretSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 
@@ -24,6 +24,7 @@ public class Drive extends CommandOpMode {
     private FlywheelSubsystem flywheel;
     private TurretSubsystem turret;
     private VisionSubsystem vision;
+    private IntakeSubsystem intake;
     private Follower follower;
 
     // 게임패드 선언
@@ -42,6 +43,12 @@ public class Drive extends CommandOpMode {
         flywheel = new FlywheelSubsystem(hardwareMap, "flywheelMotor", Motor.GoBILDA.BARE, 1, 0.58, 48, 984.5 - 0, Math.toRadians(50)); // 모터 이름 확인
         turret = new TurretSubsystem(hardwareMap, "turretMotor", Motor.GoBILDA.RPM_312, (double) 70 / 10);
         vision = new VisionSubsystem(hardwareMap, "Webcam 1");
+        intake = new IntakeSubsystem.Builder(hardwareMap, "intakeMotor")
+                .motor(Motor.GoBILDA.RPM_312)
+                .gearRatio(1)
+                .reverse(false)
+                .ZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
+                .build();
 
         // PedroPathing Follower 초기화
         follower = Constants.createFollower(hardwareMap);

@@ -1,0 +1,95 @@
+package org.firstinspires.ftc.teamcode.subsystems;
+
+import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+import com.arcrobotics.ftclib.util.LUT;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
+public class IntakeSubsystem extends SubsystemBase {
+    // p, i, d, s, v, a
+    public static double p, i, d, s, v, a;
+
+    private final double ticksPerDegree;
+    private final MotorEx intakeMotor;
+
+
+    public static class Builder {
+        private final HardwareMap hardwareMap;
+        private final String motorName;
+
+        private Motor.GoBILDA motorType;
+        private double gearRatio;
+        private boolean reverse;
+        private Motor.ZeroPowerBehavior zeroPowerBehavior;
+
+
+        public Builder(HardwareMap hardwareMap, String motorName) {
+            this.hardwareMap = hardwareMap;
+            this.motorName = motorName;
+        }
+
+        public Builder motor(Motor.GoBILDA motorType){
+            this.motorType = motorType;
+            return this;
+        }
+
+        public Builder gearRatio(double gearRatio){
+            this.gearRatio = gearRatio;
+            return this;
+        }
+
+        public Builder reverse(boolean reverse){
+            this.reverse = reverse;
+            return this;
+        }
+
+        public Builder ZeroPowerBehavior(Motor.ZeroPowerBehavior zeroPowerBehavior) {
+            this.zeroPowerBehavior = zeroPowerBehavior;
+            return this;
+        }
+
+        public IntakeSubsystem build() {
+            return new IntakeSubsystem(this);
+        }
+    }
+
+    private IntakeSubsystem(Builder builder) {
+        // 인테이크 모터 초기화
+        intakeMotor = new MotorEx(builder.hardwareMap, builder.motorName, builder.motorType);
+
+        // 모터 반전 (모터의 회전 방향이 반대라면 수정)
+        intakeMotor.setInverted(builder.reverse);
+
+        // 모터 모드
+        intakeMotor.setRunMode(Motor.RunMode.VelocityControl);
+
+        // ZeroPowerBehavior
+        intakeMotor.setZeroPowerBehavior(builder.zeroPowerBehavior);
+
+        // 1degree당 필요한 틱 수
+        ticksPerDegree = (intakeMotor.getCPR() * builder.gearRatio) / 360.0;
+
+        // PIDF 계수 설정
+        updateCoefficients();
+    }
+
+    public void updateCoefficients() {
+        intakeMotor.setVeloCoefficients(p, i, d);
+        intakeMotor.setFeedforwardCoefficients(s, v, a);
+    }
+
+    private double rpmToTps(double rpm) {
+        return (rpm * intakeMotor.getCPR()) / 60.0;
+    }
+
+    public void spin(double rpm) {
+        intakeMotor.setVelocity(rpmToTps(rpm));
+    }
+
+    public void stop() {
+        spin(0);
+        intakeMotor.stopMotor();
+    }
+
+}
